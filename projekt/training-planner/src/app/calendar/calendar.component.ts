@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FullCalendarModule, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { TrainingPlanService } from '../services/training-plan.service';
+import { CalendarEventService } from '../services/calendar-event.service';
 
 @Component({
   standalone: true,
@@ -12,6 +13,8 @@ import { TrainingPlanService } from '../services/training-plan.service';
   imports: [FullCalendarModule],
 })
 export class CalendarComponent implements OnInit {
+  @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
+
   calendarOptions: any = {
     plugins: [dayGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
@@ -21,9 +24,14 @@ export class CalendarComponent implements OnInit {
     selectable: true,
   };
 
-  constructor(private trainingPlanService: TrainingPlanService) {}
+  constructor(
+    private trainingPlanService: TrainingPlanService,
+    private eventService: CalendarEventService
+  ) {}
+
   ngOnInit(): void {
     this.loadTrainingPlans();
+    this.subscribeToNewEvents();
   }
 
   loadTrainingPlans(): void {
@@ -35,7 +43,7 @@ export class CalendarComponent implements OnInit {
       }
       return color;
     };
-  
+
     this.trainingPlanService.getTrainingPlans().subscribe({
       next: (plans) => {
         const events = plans.flatMap((plan) => {
@@ -53,5 +61,11 @@ export class CalendarComponent implements OnInit {
       },
     });
   }
-  
+
+  subscribeToNewEvents(): void {
+    this.eventService.events$.subscribe((newEvent) => {
+      const calendarApi = this.calendarComponent.getApi(); // Get FullCalendar API
+      calendarApi.addEvent(newEvent); // Dynamically add event
+    });
+  }
 }

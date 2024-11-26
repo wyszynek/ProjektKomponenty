@@ -1,0 +1,6 @@
+h1 {
+    text-align: center;  /* Centers the text horizontally */
+    position: absolute;  /* Allows vertical centering */
+    left: 50%;           /* Moves the element to the horizontal center */
+    transform: translate(-50%, -50%); /* Adjusts the element to be truly centered */
+  }
