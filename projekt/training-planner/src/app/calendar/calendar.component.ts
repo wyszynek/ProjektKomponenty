@@ -27,14 +27,25 @@ export class CalendarComponent implements OnInit {
   }
 
   loadTrainingPlans(): void {
+    const generateRandomColor = (): string => {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    };
+  
     this.trainingPlanService.getTrainingPlans().subscribe({
       next: (plans) => {
-        const events = plans.flatMap((plan) =>
-          plan.Workouts.map((workout: any) => ({
+        const events = plans.flatMap((plan) => {
+          const color = generateRandomColor();
+          return plan.Workouts.map((workout: any) => ({
             title: `${plan.name}: ${workout.trainingType}`,
             date: workout.date.split('T')[0],
-          }))
-        );
+            color: color,
+          }));
+        });
         this.calendarOptions.events = events;
       },
       error: (err) => {
