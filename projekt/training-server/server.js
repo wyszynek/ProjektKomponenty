@@ -5,7 +5,11 @@ import { TrainingPlan, Workout } from './models.js';
 const app = express();
 const PORT = 7777;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}));
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -62,6 +66,7 @@ app.post('/plans/:id/workouts', async (req, res) => {
         res.status(500).send('Could not save workout');
     }
 });
+
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
