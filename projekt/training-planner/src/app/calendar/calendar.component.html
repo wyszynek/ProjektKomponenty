@@ -1,3 +1,3 @@
-<p>calendar works!</p>
-
+<app-modal [isOpen]="isModalOpen" [event]="selectedEvent" (close)="isModalOpen = false"></app-modal>
+<!-- FullCalendar HTML -->
 <full-calendar [options]="calendarOptions"></full-calendar>
