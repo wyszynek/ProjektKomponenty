@@ -25,6 +25,7 @@ export class CalendarComponent implements OnInit {
     selectable: true,
     eventMouseEnter: this.handleEventMouseEnter.bind(this),
     eventMouseLeave: this.handleEventMouseLeave.bind(this),
+    aspectRatio: 3,
   };
 
   isModalOpen = false;
@@ -50,13 +51,21 @@ export class CalendarComponent implements OnInit {
 
     this.trainingPlanService.getTrainingPlans().subscribe({
       next: (plans) => {
+        console.log('Raw plans:', plans);
         const events = plans.flatMap((plan) => {
           const color = generateRandomColor();
-          return plan.Workouts.map((workout: any) => ({
-            title: `${plan.name}: ${workout.trainingType}`,
-            date: workout.date.split('T')[0],
-            color: color,
-          }));
+          return plan.Workouts.map((workout: any) => {
+            console.log('Raw workout:', workout);
+            return {
+              identifier: workout.id,
+              title: `${plan.name}: ${workout.trainingType}`,
+              date: workout.date.split('T')[0],
+              intensity: workout.intensity,
+              color: color,
+              description: workout.description,
+              trainingDuration: workout.duration,
+            };
+          });
         });
         this.calendarOptions.events = events;
       },
@@ -68,31 +77,29 @@ export class CalendarComponent implements OnInit {
 
   subscribeToNewEvents(): void {
     this.eventService.events$.subscribe((newEvent) => {
-      const calendarApi = this.calendarComponent.getApi(); // Get FullCalendar API
-      calendarApi.addEvent(newEvent); // Dynamically add event
+      const calendarApi = this.calendarComponent.getApi();
+      calendarApi.addEvent(newEvent);
     });
   }
   
   handleEventMouseEnter(info: any) {
-    // Delay the display of the modal after 1 second
     this.hoverTimeout = setTimeout(() => {
       this.selectedEvent = info.event;
-      this.isModalOpen = true;  // Open the modal
-    }, 1500);  // 1 second delay (1000ms)
+      this.isModalOpen = true;
+    }, 1500);
     
     if (this.leaveTimeout) {
-      clearTimeout(this.leaveTimeout);  // Clear any previous timeout for mouse leave
+      clearTimeout(this.leaveTimeout);
     }
   }
 
   handleEventMouseLeave(info: any) {
-    // Close the modal with a delay (e.g., 500ms) after mouse leaves the event
     if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);  // Clear the hover timeout if the mouse leaves early
+      clearTimeout(this.hoverTimeout);
     }
     
     this.leaveTimeout = setTimeout(() => {
-      this.isModalOpen = false;  // Close the modal after the delay
-    }, 1000);  // Adjust the delay as needed (500ms)
+      this.isModalOpen = false;
+    }, 1000);
   }
 }

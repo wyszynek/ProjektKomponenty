@@ -8,9 +8,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
     <div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
   <div class="modal-content">
     <h2>{{ event?.title }}</h2>
-    <p>Training Type: {{ event?.extendedProps?.trainingType }}</p>
     <p>Description: {{ event?.extendedProps?.description }}</p>
-    <!-- Add any other event data you want to display -->
+    <p>Intensity: {{ event?.extendedProps?.intensity }}/10</p>
+    <p>Duration: {{ event?.extendedProps?.trainingDuration }} minutes</p>
     <button (click)="closeModal()">Close</button>
   </div>
 </div>
