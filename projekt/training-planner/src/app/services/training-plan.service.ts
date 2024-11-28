@@ -11,7 +11,14 @@ export class TrainingPlanService {
   constructor(private http: HttpClient) {}
 
   getTrainingPlans(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:7777/plans'); 
+    return this.http.get<any[]>(this.apiUrl);
   }
-  
+
+  getActiveTrainingPlans(date: string): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl+'/active');
+  }
+
+  createTrainingPlan(plan: { name: string; startDate: string; endDate: string }): Observable<any> {
+    return this.http.post(this.apiUrl, plan);
+  }
 }

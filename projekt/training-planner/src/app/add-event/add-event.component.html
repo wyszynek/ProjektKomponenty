@@ -1,11 +1,53 @@
-<h1 style="padding-top: 50px;">Add new event</h1>
+<div class="container">
+  <div class="form-section">
+    <h3>Dodaj nowy plan treningowy</h3>
+    <label>
+      Nazwa planu:
+      <input type="text" [(ngModel)]="newPlanName" />
+    </label>
+    <label>
+      Data rozpoczęcia:
+      <input type="date" [(ngModel)]="newPlanStartDate" />
+    </label>
+    <label>
+      Data zakończenia:
+      <input type="date" [(ngModel)]="newPlanEndDate" />
+    </label>
+    <button (click)="addNewPlan()">Dodaj nowy plan</button>
+  </div>
+  <div class="form-section">
+    <h3>Dodaj nowe wydarzenie</h3>
+    <label>
+      Nazwa wydarzenia:
+      <input type="text" [(ngModel)]="title" />
+    </label>
+    <label>
+      Data:
+      <input type="date" [(ngModel)]="date" />
+    </label>
+    <label>
+      Wybierz plan treningowy:
+      <select [(ngModel)]="selectedPlanId">
+        <option *ngFor="let plan of activePlans" [value]="plan.id">
+          {{ plan.name }}
+        </option>
+      </select>
+    </label>
+    <label>
+      Czas trwania (minuty):
+      <input type="number" [(ngModel)]="duration" />
+    </label>
+    <label>
+      Intensywność:
+      <input type="number" [(ngModel)]="intensity" />
+    </label>
+    <label>
+      Opis:
+      <textarea [(ngModel)]="description"></textarea>
+    </label>
+    <button (click)="addEvent()">Dodaj wydarzenie</button>
+  </div>
 
-<div>
-  <label for="title">Event Title:</label>
-  <input id="title" [(ngModel)]="title" type="text" placeholder="Enter title" style="margin: 10px;"/>
 
-  <label for="date">Event Date:</label>
-  <input id="date" [(ngModel)]="date" type="date" style="margin: 10px;"/>
-
-  <button (click)="addEvent()" style="margin: 10px;">Add Event</button>
+ 
 </div>

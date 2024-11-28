@@ -1,7 +1,6 @@
 import sequelize from './db.js';
 import { DataTypes } from 'sequelize';
 
-// Definicja modelu TrainingPlan
 export const TrainingPlan = sequelize.define('TrainingPlan', {
     id: {
         type: DataTypes.INTEGER,
@@ -22,7 +21,6 @@ export const TrainingPlan = sequelize.define('TrainingPlan', {
     },
 });
 
-// Definicja modelu Workout
 export const Workout = sequelize.define('Workout', {
     id: {
         type: DataTypes.INTEGER,
@@ -50,7 +48,6 @@ export const Workout = sequelize.define('Workout', {
     },
 });
 
-// Relacje między modelami
 TrainingPlan.hasMany(Workout, { foreignKey: 'trainingPlanId', onDelete: 'CASCADE' });
 Workout.belongsTo(TrainingPlan, { foreignKey: 'trainingPlanId' });
 
