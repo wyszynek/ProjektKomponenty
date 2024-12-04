@@ -1,1 +1,107 @@
-/* You can add global styles to this file, and also import other style files */
+/* FullCalendar Bootstrap 5 theme */
+.fc {
+  font-family: Arial, sans-serif;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.fc-button {
+  background-color: #007bff;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.fc-button:hover {
+  background-color: #0056b3;
+}
+
+.fc-button-primary {
+  background-color: #28a745;
+}
+
+.fc-button-primary:hover {
+  background-color: #218838;
+}
+
+.fc-button-secondary {
+  background-color: #6c757d;
+}
+
+.fc-button-secondary:hover {
+  background-color: #5a6268;
+}
+
+.fc-daygrid-day-number {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.fc-daygrid-day-top {
+  background-color: #f1f1f1;
+  padding: 0.5rem;
+}
+
+.fc-daygrid-day {
+  padding: 10px;
+  border-radius: 0.375rem;
+}
+
+.fc-daygrid-week-number {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Styling the calendar container */
+full-calendar {
+  display: block;
+  max-width: 100%;
+  margin: 30px auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+/* Customizing the navigation bar */
+.fc-toolbar {
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Adding spacing between the buttons */
+.fc-toolbar button {
+  margin-right: 8px;
+}
+
+/* Making the calendar responsive */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fc-toolbar button {
+    margin-bottom: 10px;
+  }
+}
+
+/* Modal customization */
+.fc-event {
+  cursor: pointer;
+  border-radius: 0.375rem;
+}
+
+/* Hover effect on event blocks */
+.fc-event:hover {
+  background-color: #d4edda;
+}

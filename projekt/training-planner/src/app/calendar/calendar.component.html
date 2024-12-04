@@ -1,11 +1,22 @@
-<h1>Training Planner</h1>
+<h1 class="display-3 text-center text-uppercase text-gradient mb-4">Training Planner</h1>
+
+<div class="filter-container mb-3">
+    <label for="planFilter" class="form-label">Choose plan:</label>
+    <select id="planFilter" class="form-select" (change)="filterTrainingPlans($event)">
+      <option value="">All Plans</option>
+      <option *ngFor="let plan of trainingPlans" [value]="plan.id">
+        {{ plan.name }}
+      </option>
+    </select>
+</div>
 
 <app-modal [isOpen]="isModalOpen" [event]="selectedEvent" (close)="isModalOpen = false"></app-modal>
 
-<full-calendar #calendar [options]="calendarOptions"></full-calendar>
+<full-calendar #calendar [options]="calendarOptions" class="my-4"></full-calendar>
 
 <app-edit-workout *ngIf="selectedWorkout"
                   [workout]="selectedWorkout"
                   (cancel)="handleCancelEdit()"
                   (save)="handleSaveEdit($event)">
 </app-edit-workout>
+
