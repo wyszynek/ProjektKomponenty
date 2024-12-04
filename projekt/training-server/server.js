@@ -162,6 +162,29 @@ app.put('/plans/:planId/workouts/:workoutId', async (req, res) => {
     }
 });
 
+app.delete('/plans/:planId/workouts/:workoutId', async (req, res) => {
+    const { planId, workoutId } = req.params;  // Pobieramy id planu i treningu z parametrów URL
+
+    try {
+        const plan = await TrainingPlan.findByPk(planId);
+        if (!plan) {
+            return res.status(404).json({ message: 'Training plan not found' });
+        }
+
+        const workout = await Workout.findOne({ where: { id: workoutId, trainingPlanId: planId } });
+        if (!workout) {
+            return res.status(404).json({ message: 'Workout not found' });
+        }
+
+        await workout.destroy();
+
+        return res.status(200).json({ message: 'Workout deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting workout:', err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });

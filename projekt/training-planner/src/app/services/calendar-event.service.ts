@@ -21,7 +21,6 @@ export class CalendarEventService {
     intensity: number;
     description: string;
   }): Observable<any> {
-    console.log('Sending event to backend:', event);
     return this.http.post(this.apiUrl, {
       trainingPlanId: event.trainingPlanId,
       date: event.date,
@@ -31,9 +30,26 @@ export class CalendarEventService {
       description: event.description,
     });
   }
-  
-  
-  
+
+  private baseUrl = 'http://localhost:7777/plans';
+  updateWorkout(planId: number, workoutId: number, updatedWorkout: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${planId}/workouts/${workoutId}`, {
+      trainingType: updatedWorkout.trainingType,
+      date: updatedWorkout.date,
+      duration: updatedWorkout.duration,
+      intensity: updatedWorkout.intensity,
+      description: updatedWorkout.description,
+    });
+  }
+
+  getWorkoutDetails(planId: number, workoutId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${planId}/workouts/${workoutId}`);
+  }
+
+  deleteWorkout(planId: number, workoutId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${planId}/workouts/${workoutId}`);
+  }
+
   emitNewEvent(event: any): void {
     this.eventsSubject.next(event);
   }

@@ -1,4 +1,11 @@
 <h1>Training Planner</h1>
+
 <app-modal [isOpen]="isModalOpen" [event]="selectedEvent" (close)="isModalOpen = false"></app-modal>
-<!-- FullCalendar HTML -->
+
 <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+
+<app-edit-workout *ngIf="selectedWorkout"
+                  [workout]="selectedWorkout"
+                  (cancel)="handleCancelEdit()"
+                  (save)="handleSaveEdit($event)">
+</app-edit-workout>
