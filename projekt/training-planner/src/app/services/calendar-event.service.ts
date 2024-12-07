@@ -32,7 +32,11 @@ export class CalendarEventService {
   }
 
   private baseUrl = 'http://localhost:7777/plans';
-  updateWorkout(planId: number, workoutId: number, updatedWorkout: any): Observable<any> {
+  updateWorkout(
+    planId: number,
+    workoutId: number,
+    updatedWorkout: any
+  ): Observable<any> {
     return this.http.put(`${this.baseUrl}/${planId}/workouts/${workoutId}`, {
       trainingType: updatedWorkout.trainingType,
       date: updatedWorkout.date,
@@ -64,5 +68,15 @@ export class CalendarEventService {
 
   emitNewEvent(event: any): void {
     this.eventsSubject.next(event);
+  }
+
+  updateWorkoutDate(
+    planId: number,
+    workoutId: number,
+    newDate: string
+  ): Observable<any> {
+    const url = `${this.baseUrl}/${planId}/workouts/${workoutId}/date`;
+    console.log('URL:', url, 'Payload:', { newDate }); // Add this to debug
+    return this.http.put(url, { newDate });
   }
 }

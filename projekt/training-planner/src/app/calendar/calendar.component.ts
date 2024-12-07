@@ -30,16 +30,17 @@ export class CalendarComponent implements OnInit {
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
 
   calendarOptions: any = {
-    themeSystem: 'bootsrap5',
+    themeSystem: 'bootstrap5',
     plugins: [dayGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
     firstDay: 1,
     events: [],
     editable: true,
     selectable: true,
-    eventMouseEnter: this.handleEventMouseEnter.bind(this),
-    eventMouseLeave: this.handleEventMouseLeave.bind(this),
-    eventClick: this.handleEventClick.bind(this),
+    eventDrop: (info: any) => this.handleEventDrop(info),
+    eventMouseEnter: (info: any) => this.handleEventMouseEnter(info),
+    eventMouseLeave: (info: any) => this.handleEventMouseLeave(info),
+    eventClick: (info: any) => this.handleEventClick(info),
     aspectRatio: 3,
   };
 
@@ -110,6 +111,28 @@ export class CalendarComponent implements OnInit {
       },
     });
   }
+
+  handleEventDrop(info: any): void {
+    const event = info.event;
+
+    const updatedWorkout = {
+        id: +event.id, // Convert to number
+        newDate: event.startStr,
+        trainingPlanId: +event.extendedProps.trainingPlanId, // Convert to number
+    };
+
+    this.eventService.updateWorkoutDate(updatedWorkout.trainingPlanId, updatedWorkout.id, updatedWorkout.newDate)
+        .subscribe({
+            next: () => {
+                console.log('Workout date updated successfully');
+            },
+            error: (err) => {
+                console.error('Error updating workout date:', err);
+                info.revert(); // Revert event drag on error
+            },
+        });
+}
+
 
   filterTrainingPlans(event: Event): void {
     const selectedOptions = (event.target as HTMLSelectElement).selectedOptions;
