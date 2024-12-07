@@ -38,8 +38,7 @@ export class CalendarComponent implements OnInit {
     editable: true,
     selectable: true,
     eventDrop: (info: any) => this.handleEventDrop(info),
-    eventMouseEnter: (info: any) => this.handleEventMouseEnter(info),
-    eventMouseLeave: (info: any) => this.handleEventMouseLeave(info),
+    eventDidMount: (info: any) => this.handleEventDidMount(info),
     eventClick: (info: any) => this.handleEventClick(info),
     aspectRatio: 3,
   };
@@ -99,6 +98,7 @@ export class CalendarComponent implements OnInit {
               intensity: workout.intensity,
               description: workout.description,
               trainingDuration: workout.duration,
+              date: workout.date,
             },
           }))
         );
@@ -116,23 +116,27 @@ export class CalendarComponent implements OnInit {
     const event = info.event;
 
     const updatedWorkout = {
-        id: +event.id, // Convert to number
-        newDate: event.startStr,
-        trainingPlanId: +event.extendedProps.trainingPlanId, // Convert to number
+      id: +event.id, // Convert to number
+      newDate: event.startStr,
+      trainingPlanId: +event.extendedProps.trainingPlanId, // Convert to number
     };
 
-    this.eventService.updateWorkoutDate(updatedWorkout.trainingPlanId, updatedWorkout.id, updatedWorkout.newDate)
-        .subscribe({
-            next: () => {
-                console.log('Workout date updated successfully');
-            },
-            error: (err) => {
-                console.error('Error updating workout date:', err);
-                info.revert(); // Revert event drag on error
-            },
-        });
-}
-
+    this.eventService
+      .updateWorkoutDate(
+        updatedWorkout.trainingPlanId,
+        updatedWorkout.id,
+        updatedWorkout.newDate
+      )
+      .subscribe({
+        next: () => {
+          console.log('Workout date updated successfully');
+        },
+        error: (err) => {
+          console.error('Error updating workout date:', err);
+          info.revert(); // Revert event drag on error
+        },
+      });
+  }
 
   filterTrainingPlans(event: Event): void {
     const selectedOptions = (event.target as HTMLSelectElement).selectedOptions;
@@ -224,42 +228,50 @@ export class CalendarComponent implements OnInit {
 
   handleSaveEdit(updatedWorkout: any): void {
     const originalTrainingPlanId = updatedWorkout.originalTrainingPlanId; // Oryginalny ID planu
-    console.log("stare id: ", originalTrainingPlanId);
+    console.log('stare id: ', originalTrainingPlanId);
 
     const updatedTrainingPlanId = updatedWorkout.trainingPlanId; // Nowy plan (po zmianie)
-    console.log("nowe id: ", updatedTrainingPlanId);
-    
-    const workoutId = updatedWorkout.id; 
-  
+    console.log('nowe id: ', updatedTrainingPlanId);
+
+    const workoutId = updatedWorkout.id;
+
     // Jeśli plan został zmieniony, wykonaj PUT do starego planu i przekazuj nowe ID planu
     if (originalTrainingPlanId !== updatedTrainingPlanId) {
-      this.eventService.updateWorkoutNewPlan(originalTrainingPlanId, workoutId, updatedTrainingPlanId, updatedWorkout).subscribe({
-        next: (response) => {
-          console.log('Workout updated successfully:', response);
-          this.selectedWorkout = null; 
-          this.loadTrainingPlans(); 
-          this.isEditModalOpen = false;
-        },
-        error: (err) => {
-          console.error('Error updating workout:', err);
-        },
-      });
+      this.eventService
+        .updateWorkoutNewPlan(
+          originalTrainingPlanId,
+          workoutId,
+          updatedTrainingPlanId,
+          updatedWorkout
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Workout updated successfully:', response);
+            this.selectedWorkout = null;
+            this.loadTrainingPlans();
+            this.isEditModalOpen = false;
+          },
+          error: (err) => {
+            console.error('Error updating workout:', err);
+          },
+        });
     } else {
       // Jeśli plan się nie zmienił, tylko zaktualizuj workout w obrębie tego samego planu
-      this.eventService.updateWorkout(updatedTrainingPlanId, workoutId, updatedWorkout).subscribe({
-        next: (response) => {
-          console.log('Workout updated successfully:', response);
-          this.selectedWorkout = null; // Resetowanie po zapisaniu
-          this.loadTrainingPlans(); // Ponowne załadowanie danych do kalendarza
-          this.isEditModalOpen = false; // Zamknięcie modal edycji
-        },
-        error: (err) => {
-          console.error('Error updating workout:', err);
-        },
-      });
+      this.eventService
+        .updateWorkout(updatedTrainingPlanId, workoutId, updatedWorkout)
+        .subscribe({
+          next: (response) => {
+            console.log('Workout updated successfully:', response);
+            this.selectedWorkout = null; // Resetowanie po zapisaniu
+            this.loadTrainingPlans(); // Ponowne załadowanie danych do kalendarza
+            this.isEditModalOpen = false; // Zamknięcie modal edycji
+          },
+          error: (err) => {
+            console.error('Error updating workout:', err);
+          },
+        });
     }
   }
-  
 
   subscribeToNewEvents(): void {
     this.eventService.events$.subscribe((newEvent) => {
@@ -268,25 +280,51 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  handleEventMouseEnter(info: any) {
-    this.hoverTimeout = setTimeout(() => {
-      this.selectedEvent = info.event;
-      this.isModalOpen = true;
-    }, 1500);
+  handleEventDidMount(info: any): void {
+    const eventElement = info.el;
 
-    if (this.leaveTimeout) {
-      clearTimeout(this.leaveTimeout);
-    }
+    eventElement.addEventListener('mouseenter', () =>
+      this.handleEventMouseEnter(info)
+    );
+
+    eventElement.addEventListener('mouseleave', () =>
+      this.handleEventMouseLeave(info)
+    );
   }
 
-  handleEventMouseLeave(info: any) {
+  handleEventMouseEnter(info: any): void {
+    this.selectedEvent = info.event;
+    console.log(this.selectedEvent);
+
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
     }
 
-    this.leaveTimeout = setTimeout(() => {
-      this.isModalOpen = false;
-    }, 1000);
+    this.hoverTimeout = setTimeout(() => {
+      this.isModalOpen = true;
+      this.addClickOutsideListener();
+    }, 1500);
+  }
+
+  handleEventMouseLeave(info: any): void {
+    this.selectedEvent = info.event;
+    if (this.hoverTimeout < 1500) {
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  addClickOutsideListener(): void {
+    const modalElement = document.querySelector('.modal');
+    const bodyElement = document.querySelector('body');
+
+    const closeModal = (event: MouseEvent) => {
+      if (modalElement && !modalElement.contains(event.target as Node)) {
+        this.isModalOpen = false;
+        bodyElement?.removeEventListener('click', closeModal);
+      }
+    };
+
+    bodyElement?.addEventListener('click', closeModal);
   }
 
   refreshCalendar(): void {

@@ -6,15 +6,15 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   standalone: true,
   template: `
     <div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
-  <div class="modal-content">
-    <h2>{{ event?.title }}</h2>
-    <p>Description: {{ event?.extendedProps?.description }}</p>
-    <p>Intensity: {{ event?.extendedProps?.intensity }}/10</p>
-    <p>Duration: {{ event?.extendedProps?.trainingDuration }} minutes</p>
-    <button (click)="closeModal()">Close</button>
-  </div>
-</div>
-
+      <div class="modal-content">
+        <h2>{{ event?.title }}</h2>
+        <p>Description: {{ event?.extendedProps?.description }}</p>
+        <p>Intensity: {{ event?.extendedProps?.intensity }}/10</p>
+        <p>Duration: {{ event?.extendedProps?.trainingDuration }} minutes</p>
+        <p>Date: {{ event?.extendedProps?.date.split('T')[0] }}</p>
+        <button (click)="closeModal()">Close</button>
+      </div>
+    </div>
   `,
   styleUrls: ['./modal.component.css'],
   imports: [CommonModule],
