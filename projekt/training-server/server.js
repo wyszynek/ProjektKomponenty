@@ -185,6 +185,36 @@ app.delete('/plans/:planId/workouts/:workoutId', async (req, res) => {
     }
 });
 
+app.put('/plans/:originalTrainingPlanId/workouts/:workoutId/move/:updatedTrainingPlanId', async (req, res) => {
+    const { originalTrainingPlanId, workoutId, updatedTrainingPlanId } = req.params;
+    const { trainingType, date, duration, intensity, description } = req.body;
+
+    try {
+        // Znajdź workout w bazie po workoutId i originalTrainingPlanId
+        const workout = await Workout.findOne({ where: { id: workoutId, trainingPlanId: originalTrainingPlanId } });
+        
+        if (!workout) {
+            return res.status(404).json({ message: 'Workout not found in the original training plan' });
+        }
+
+        // Zaktualizuj workout, przenosząc go do nowego planu
+        workout.trainingPlanId = updatedTrainingPlanId; // Zmień ID planu
+        workout.trainingType = trainingType || workout.trainingType;
+        workout.date = date || workout.date;
+        workout.duration = duration || workout.duration;
+        workout.intensity = intensity || workout.intensity;
+        workout.description = description || workout.description;
+
+        // Zapisz zmiany w bazie
+        await workout.save();
+
+        return res.status(200).json(workout);
+    } catch (err) {
+        console.error('Error updating workout:', err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });

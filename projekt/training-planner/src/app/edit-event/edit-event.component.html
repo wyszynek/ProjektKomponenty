@@ -2,6 +2,15 @@
   <h2>Edytuj wydarzenie</h2>
   <form>
     <div class="form-group">
+      <label for="plan">Training Plan</label>
+      <select [(ngModel)]="workout.trainingPlanId" name="trainingPlanId" id="plan">
+        <option *ngFor="let plan of availablePlans" [value]="plan.id">
+          {{ plan.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
       <label for="trainingType">Nazwa wydarzenia</label>
       <input [(ngModel)]="workout.trainingType" name="trainingType" id="trainingType" placeholder="Enter training type" />
     </div>

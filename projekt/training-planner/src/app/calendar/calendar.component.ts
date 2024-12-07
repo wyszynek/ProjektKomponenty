@@ -200,24 +200,43 @@ export class CalendarComponent implements OnInit {
   }
 
   handleSaveEdit(updatedWorkout: any): void {
-    const planId = updatedWorkout.trainingPlanId; // ID planu treningowego
-    const workoutId = updatedWorkout.workoutId; // ID workoutu
+    const originalTrainingPlanId = updatedWorkout.originalTrainingPlanId; // Oryginalny ID planu
+    console.log("stare id: ", originalTrainingPlanId);
 
-    // Wyślij PUT request do API, aby zaktualizować workout
-    this.eventService
-      .updateWorkout(planId, workoutId, updatedWorkout)
-      .subscribe({
+    const updatedTrainingPlanId = updatedWorkout.trainingPlanId; // Nowy plan (po zmianie)
+    console.log("nowe id: ", updatedTrainingPlanId);
+    
+    const workoutId = updatedWorkout.id; 
+  
+    // Jeśli plan został zmieniony, wykonaj PUT do starego planu i przekazuj nowe ID planu
+    if (originalTrainingPlanId !== updatedTrainingPlanId) {
+      this.eventService.updateWorkoutNewPlan(originalTrainingPlanId, workoutId, updatedTrainingPlanId, updatedWorkout).subscribe({
         next: (response) => {
           console.log('Workout updated successfully:', response);
-          this.selectedWorkout = null;
-          this.loadTrainingPlans();
+          this.selectedWorkout = null; 
+          this.loadTrainingPlans(); 
           this.isEditModalOpen = false;
         },
         error: (err) => {
           console.error('Error updating workout:', err);
         },
       });
+    } else {
+      // Jeśli plan się nie zmienił, tylko zaktualizuj workout w obrębie tego samego planu
+      this.eventService.updateWorkout(updatedTrainingPlanId, workoutId, updatedWorkout).subscribe({
+        next: (response) => {
+          console.log('Workout updated successfully:', response);
+          this.selectedWorkout = null; // Resetowanie po zapisaniu
+          this.loadTrainingPlans(); // Ponowne załadowanie danych do kalendarza
+          this.isEditModalOpen = false; // Zamknięcie modal edycji
+        },
+        error: (err) => {
+          console.error('Error updating workout:', err);
+        },
+      });
+    }
   }
+  
 
   subscribeToNewEvents(): void {
     this.eventService.events$.subscribe((newEvent) => {

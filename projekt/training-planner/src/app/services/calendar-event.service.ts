@@ -42,6 +42,18 @@ export class CalendarEventService {
     });
   }
 
+  updateWorkoutNewPlan(
+    originalTrainingPlanId: number,
+    workoutId: number,
+    updatedTrainingPlanId: number,
+    updatedWorkout: any
+  ): Observable<any> {
+    return this.http.put(
+      `http://localhost:7777/plans/${originalTrainingPlanId}/workouts/${workoutId}/move/${updatedTrainingPlanId}`,
+      updatedWorkout
+    );
+  }
+
   getWorkoutDetails(planId: number, workoutId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/${planId}/workouts/${workoutId}`);
   }

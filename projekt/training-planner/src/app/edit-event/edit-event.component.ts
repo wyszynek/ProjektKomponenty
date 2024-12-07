@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarEventService } from '../services/calendar-event.service';
+import { TrainingPlanService } from '../services/training-plan.service';
 
 @Component({
   standalone: true,
@@ -10,19 +11,46 @@ import { CalendarEventService } from '../services/calendar-event.service';
   styleUrls: ['./edit-event.component.css'],
   imports: [CommonModule, FormsModule],
 })
-export class EditWorkoutComponent {
-  @Input() workout: any | null = null;  // This will receive the workout data
+export class EditWorkoutComponent implements OnInit{
+  @Input() workout: any;  // This will receive the workout data
   @Output() cancel = new EventEmitter<void>();  // Event to cancel editing
   @Output() save = new EventEmitter<any>();  // Event to save the edited workout
   @Output() workoutUpdated = new EventEmitter<any>();
 
-  constructor(private eventService: CalendarEventService) {}
+  availablePlans: any[] = [];
+  originalTrainingPlanId: number | undefined;
 
-  // Handle Save button
+  constructor(private eventService: CalendarEventService, private trainingPlanService: TrainingPlanService) {}
+
+  ngOnInit(): void {
+    this.loadTrainingPlans();
+    this.originalTrainingPlanId = this.workout.trainingPlanId;
+  }
+
+  loadTrainingPlans(): void {
+    this.trainingPlanService.getTrainingPlans().subscribe({
+      next: (plans) => {
+        this.availablePlans = plans.map((plan: any) => ({
+          id: plan.id,
+          name: plan.name,
+        }));
+      },
+      error: (err) => {
+        console.error('Error loading training plans:', err);
+      },
+    });
+  }
+
+  // Emituj zapisane dane
   saveWorkout(): void {
-    if (this.workout) {
-      this.save.emit(this.workout);  
-    }
+    // Jeśli zmieniono plan, wyślij oryginalne ID planu (jeśli inne niż wybrane)
+    const workoutToSave = {
+      ...this.workout,
+      originalTrainingPlanId: this.originalTrainingPlanId, // Dodaj oryginalne ID planu
+      updatedTrainingPlanId: this.workout.trainingPlanId,  // Dodaj nowe ID planu
+    };
+
+    this.save.emit(workoutToSave);  // Zmienione workout z oryginalnym planem
   }
 
   cancelEdit(): void {
