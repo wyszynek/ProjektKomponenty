@@ -43,6 +43,23 @@ export class EditWorkoutComponent implements OnInit{
 
   // Emituj zapisane dane
   saveWorkout(): void {
+    if(this.workout.date == null) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+    if (this.workout.intensity == null || this.workout.intensity > 10 || this.workout.intensity < 1) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+    else if(this.workout.duration == null || this.workout.duration < 1) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+    else if(this.workout.trainingType == null) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
     // Jeśli zmieniono plan, wyślij oryginalne ID planu (jeśli inne niż wybrane)
     const workoutToSave = {
       ...this.workout,
