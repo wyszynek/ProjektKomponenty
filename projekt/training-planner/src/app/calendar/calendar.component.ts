@@ -190,27 +190,11 @@ export class CalendarComponent implements OnInit {
     };
 
     this.isEditModalOpen = true;
-    this.scrollToEditForm();
-  }
-
-  scrollToEditForm(): void {
-    const editFormElement = document.getElementById('edit-form');
-    if (editFormElement) {
-      editFormElement.scrollIntoView({ behavior: 'smooth' });
-    }
   }
 
   handleCancelEdit(): void {
     this.selectedWorkout = null;
     this.isEditModalOpen = false;
-    this.scrollToCalendar();
-  }
-
-  scrollToCalendar(): void {
-    const calendarElement = document.getElementById('calendar');
-    if (calendarElement) {
-      calendarElement.scrollIntoView({ behavior: 'smooth' });
-    }
   }
 
   handleDeleteWorkout(): void {
@@ -234,8 +218,6 @@ export class CalendarComponent implements OnInit {
 
               this.loadTrainingPlans();
               this.isEditModalOpen = false;
-
-              this.scrollToCalendar();
             },
             error: (err) => {
               console.error('Error deleting workout:', err);
@@ -269,8 +251,6 @@ export class CalendarComponent implements OnInit {
             this.selectedWorkout = null;
             this.loadTrainingPlans();
             this.isEditModalOpen = false;
-
-            this.scrollToCalendar();
           },
           error: (err) => {
             console.error('Error updating workout:', err);
@@ -286,8 +266,6 @@ export class CalendarComponent implements OnInit {
             this.selectedWorkout = null; // Resetowanie po zapisaniu
             this.loadTrainingPlans(); // Ponowne załadowanie danych do kalendarza
             this.isEditModalOpen = false; // Zamknięcie modal edycji
-
-            this.scrollToCalendar();
           },
           error: (err) => {
             console.error('Error updating workout:', err);
