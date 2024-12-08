@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
 export class AddEventComponent implements OnInit {
   title = '';
   date = '';
-  selectedPlanId: string | null = null;
+  selectedPlanId: string = '';
   duration: number | null = null;
   intensity: number | null = null;
   description = '';
@@ -22,6 +22,9 @@ export class AddEventComponent implements OnInit {
   newPlanName = '';
   newPlanStartDate = '';
   newPlanEndDate = '';
+
+  showPlanForm: boolean = false;
+  showEventForm: boolean = false;
 
   constructor(
     private eventService: CalendarEventService,
@@ -32,58 +35,86 @@ export class AddEventComponent implements OnInit {
     this.loadActivePlans();
   }
 
-  loadActivePlans(): void {
-    this.planService.getActiveTrainingPlans(this.date).subscribe({
-      next: (plans) => {
-        this.activePlans = plans;
+  allPlans: any[] = [];
+
+loadActivePlans(): void {
+  this.planService.getActiveTrainingPlans('').subscribe({
+    next: (plans) => {
+      this.allPlans = plans;
+      this.activePlans = plans;
+    },
+    error: (err) => {
+      console.error('Error fetching active plans:', err);
+    },
+  });
+}
+
+filterPlansByDate(): void {
+  if (!this.date) {
+    this.activePlans = this.allPlans;
+    return;
+  }
+  const selectedDate = new Date(this.date);
+  this.activePlans = this.allPlans.filter((plan) => {
+    const startDate = new Date(plan.startDate);
+    const endDate = new Date(plan.endDate);
+
+    return selectedDate >= startDate && selectedDate <= endDate;
+  });
+}
+
+  
+addEvent(): void {
+  if (this.title && this.date && this.selectedPlanId && this.duration && this.intensity) {
+    const selectedPlan = this.activePlans.find(plan => plan.id === +this.selectedPlanId);
+
+    if (!selectedPlan) {
+      console.error('Selected plan not found.');
+      return;
+    }
+
+    const newEvent = {
+      title: `${selectedPlan.name}: ${this.title}`,
+      date: this.date,
+      trainingPlanId: this.selectedPlanId,
+      duration: this.duration,
+      intensity: this.intensity,
+      description: this.description,
+    };
+
+    console.log('Adding new event:', newEvent);
+
+    this.eventService.addEvent(newEvent).subscribe({
+      next: (response) => {
+        console.log('Event added successfully.');
+        this.resetEventForm();
+        this.eventService.emitNewEvent({
+          id: response.id,
+          title: newEvent.title,
+          date: newEvent.date,
+          trainingPlanId: newEvent.trainingPlanId,
+          duration: newEvent.duration,
+          intensity: newEvent.intensity,
+          description: newEvent.description,
+        });
+        this.showEventForm = false;
       },
       error: (err) => {
-        console.error('Error fetching active plans:', err);
+        console.error('Error adding event:', err);
       },
     });
+  } else {
+    console.error('Missing required fields for event:', {
+      title: this.title,
+      date: this.date,
+      selectedPlanId: this.selectedPlanId,
+      duration: this.duration,
+      intensity: this.intensity,
+    });
   }
+}
 
-  addEvent(): void {
-    if (this.title && this.date && this.selectedPlanId && this.duration && this.intensity) {
-      const newEvent = {
-        title: this.title,
-        date: this.date,
-        trainingPlanId: this.selectedPlanId,
-        duration: this.duration,
-        intensity: this.intensity,
-        description: this.description,
-      };
 
-      console.log('Adding new event:', newEvent);
-
-      this.eventService.addEvent(newEvent).subscribe({
-        next: (response) => {
-          console.log('Event added successfully.');
-          this.resetEventForm();
-          this.eventService.emitNewEvent({
-            id: response.id,
-            title: newEvent.title,
-            date: newEvent.date,
-            trainingPlanId: newEvent.trainingPlanId,
-            duration: newEvent.duration,
-            intensity: newEvent.intensity,
-            description: newEvent.description,
-          });
-        },
-        error: (err) => {
-          console.error('Error adding event:', err);
-        },
-      });
-    } else {
-      console.error('Missing required fields for event:', {
-        title: this.title,
-        date: this.date,
-        selectedPlanId: this.selectedPlanId,
-        duration: this.duration,
-        intensity: this.intensity,
-      });
-    }
-  }
 
   addNewPlan(): void {
     if (this.newPlanName && this.newPlanStartDate && this.newPlanEndDate) {
@@ -100,6 +131,7 @@ export class AddEventComponent implements OnInit {
           console.log('New training plan added successfully.');
           this.resetPlanForm();
           this.loadActivePlans();
+          this.showPlanForm = false;
         },
         error: (err) => {
           console.error('Error adding new training plan:', err);
@@ -117,7 +149,7 @@ export class AddEventComponent implements OnInit {
   private resetEventForm(): void {
     this.title = '';
     this.date = '';
-    this.selectedPlanId = null;
+    this.selectedPlanId = '';
     this.duration = null;
     this.intensity = null;
     this.description = '';
