@@ -6,25 +6,27 @@ import { TrainingPlanService } from '../services/training-plan.service';
 
 @Component({
   standalone: true,
-  selector: 'app-edit-workout', 
+  selector: 'app-edit-workout',
   templateUrl: './edit-event.component.html',
   styleUrls: ['./edit-event.component.css'],
   imports: [CommonModule, FormsModule],
 })
-export class EditWorkoutComponent implements OnInit{
-  @Input() workout: any;  // This will receive the workout data
-  @Output() cancel = new EventEmitter<void>();  // Event to cancel editing
-  @Output() save = new EventEmitter<any>();  // Event to save the edited workout
+export class EditWorkoutComponent implements OnInit {
+  @Input() workout: any; // Otrzymuje dane treningu
+  @Output() cancel = new EventEmitter<void>(); // Emituje anulowanie edycji
+  @Output() save = new EventEmitter<any>(); // Emituje zapisanie edytowanego treningu
   @Output() workoutUpdated = new EventEmitter<any>();
 
   availablePlans: any[] = [];
   originalTrainingPlanId: number | undefined;
+  editableWorkout: any = {};
 
   constructor(private eventService: CalendarEventService, private trainingPlanService: TrainingPlanService) {}
 
   ngOnInit(): void {
     this.loadTrainingPlans();
     this.originalTrainingPlanId = this.workout.trainingPlanId;
+    this.editableWorkout = { ...this.workout };
   }
 
   loadTrainingPlans(): void {
@@ -41,53 +43,86 @@ export class EditWorkoutComponent implements OnInit{
     });
   }
 
-  // Emituj zapisane dane
+  //Kiedy użytkownik zmienia tekst w jakimś polu, zdarzenie input jest wywoływane.
+  //event.target odnosi się do elementu <input>, który został zmodyfikowany.
+  //Za pomocą inputElement.value, otrzymujemy wartość wpisaną przez użytkownika.
+  //Bez tych metod, zmiany w formularzu nie byłyby automatycznie przekazywane do modelu.
+
+  onTrainingPlanChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedPlanId = parseInt(selectElement.value, 10);
+    this.editableWorkout.trainingPlanId = isNaN(selectedPlanId) ? null : selectedPlanId;
+  }
+
+  onTrainingTypeInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editableWorkout.trainingType = inputElement.value.trim();
+  }
+
+  onDateInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editableWorkout.date = inputElement.value;
+  }
+
+  onIntensityInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = parseInt(inputElement.value, 10);
+    this.editableWorkout.intensity = isNaN(value) ? null : value;
+  }
+
+  onDurationInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = parseFloat(inputElement.value);
+    this.editableWorkout.duration = isNaN(value) ? 0 : value;
+  }
+
+  onDescriptionInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editableWorkout.description = inputElement.value.trim();
+  }
+
   saveWorkout(): void {
-    if(this.workout.date == null) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-    if (this.workout.intensity == null || this.workout.intensity > 10 || this.workout.intensity < 1) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-    else if(this.workout.duration == null || this.workout.duration < 1) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-    else if(this.workout.trainingType == null) {
+    if (this.editableWorkout.date == null) {
       alert('Please fill in all required fields correctly.');
       return;
     }
 
-    // Jeśli zmieniono plan, wyślij oryginalne ID planu (jeśli inne niż wybrane)
+    if (this.editableWorkout.intensity == null || this.editableWorkout.intensity > 10 || this.editableWorkout.intensity < 1) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
+    if (this.editableWorkout.duration < 1 || this.editableWorkout.duration == null) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
     const workoutToSave = {
-      ...this.workout,
-      originalTrainingPlanId: this.originalTrainingPlanId, // Dodaj oryginalne ID planu
-      updatedTrainingPlanId: this.workout.trainingPlanId,  // Dodaj nowe ID planu
+      ...this.editableWorkout,
+      originalTrainingPlanId: this.originalTrainingPlanId,
+      updatedTrainingPlanId: this.editableWorkout.trainingPlanId,
     };
 
-    this.save.emit(workoutToSave);  // Zmienione workout z oryginalnym planem
+    this.save.emit(workoutToSave);
   }
 
   cancelEdit(): void {
-    this.cancel.emit();  
+    this.cancel.emit();
   }
 
   deleteWorkout(): void {
     if (this.workout) {
       if (confirm('Are you sure you want to delete this workout?')) {
-        this.eventService.deleteWorkout(this.workout.trainingPlanId, this.workout.id)
-          .subscribe({
-            next: () => {
-              console.log('Workout deleted');
-              this.workout = null;  // Clear workout after deletion
-              this.workoutUpdated.emit(null);  // Inform parent that the workout was deleted
-            },
-            error: (err) => {
-              console.error('Error deleting workout:', err);
-            }
-          });
+        this.eventService.deleteWorkout(this.editableWorkout.trainingPlanId, this.editableWorkout.id).subscribe({
+          next: () => {
+            console.log('Workout deleted');
+            this.workout = null;
+            this.workoutUpdated.emit(null);
+          },
+          error: (err) => {
+            console.error('Error deleting workout:', err);
+          },
+        });
       }
     }
   }
