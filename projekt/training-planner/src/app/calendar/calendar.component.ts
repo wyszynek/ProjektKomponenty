@@ -197,33 +197,30 @@ export class CalendarComponent implements OnInit {
     this.isEditModalOpen = false;
   }
 
-  handleDeleteWorkout(): void {
-    if (this.selectedWorkout) {
-      if (confirm('Are you sure you want to delete this workout?')) {
-        this.eventService
-          .deleteWorkout(
-            this.selectedWorkout.trainingPlanId,
-            this.selectedWorkout.id
-          )
-          .subscribe({
-            next: () => {
-              console.log('Workout deleted');
-              this.selectedWorkout = null;
-
-              const calendarApi = this.calendarComponent.getApi();
-              const event = calendarApi.getEventById(this.selectedWorkout.id);
-              if (event) {
-                event.remove();
-              }
-
-              this.loadTrainingPlans();
-              this.isEditModalOpen = false;
-            },
-            error: (err) => {
-              console.error('Error deleting workout:', err);
-            },
-          });
-      }
+  handleDeleteWorkout(workout: any): void {
+    if (confirm('Are you sure you want to delete this workout?')) {
+      this.eventService.deleteWorkout(workout.trainingPlanId, workout.id).subscribe(
+        () => {
+          // Po pomyślnym usunięciu, zamykamy modal i usuwamy event z kalendarza
+          console.log('Workout deleted successfully');
+          this.isEditModalOpen = false;
+    
+          // Usuwamy wydarzenie z kalendarza
+          const calendarApi = this.calendarComponent.getApi();
+          const event = calendarApi.getEventById(workout.workoutId); // Pobieramy wydarzenie po ID
+          if (event) {
+            event.remove(); // Usuwamy wydarzenie z kalendarza
+          }
+    
+          this.selectedWorkout = null;
+          this.loadTrainingPlans();
+          this.isEditModalOpen = false;
+        },
+        (error) => {
+          console.error('Error deleting workout:', error);
+          // Obsługa błędów
+        }
+      );
     }
   }
 

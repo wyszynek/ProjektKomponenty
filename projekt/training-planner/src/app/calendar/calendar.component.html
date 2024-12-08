@@ -17,6 +17,7 @@
 <app-edit-workout *ngIf="selectedWorkout"
                   [workout]="selectedWorkout"
                   (cancel)="handleCancelEdit()"
-                  (save)="handleSaveEdit($event)">
+                  (save)="handleSaveEdit($event)"
+                  (delete)="handleDeleteWorkout($event)">
 </app-edit-workout>
 

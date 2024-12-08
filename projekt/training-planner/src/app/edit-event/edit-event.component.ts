@@ -15,7 +15,7 @@ export class EditWorkoutComponent implements OnInit {
   @Input() workout: any; // Otrzymuje dane treningu
   @Output() cancel = new EventEmitter<void>(); // Emituje anulowanie edycji
   @Output() save = new EventEmitter<any>(); // Emituje zapisanie edytowanego treningu
-  @Output() workoutUpdated = new EventEmitter<any>();
+  @Output() delete = new EventEmitter<any>();
 
   availablePlans: any[] = [];
   originalTrainingPlanId: number | undefined;
@@ -111,19 +111,6 @@ export class EditWorkoutComponent implements OnInit {
   }
 
   deleteWorkout(): void {
-    if (this.workout) {
-      if (confirm('Are you sure you want to delete this workout?')) {
-        this.eventService.deleteWorkout(this.editableWorkout.trainingPlanId, this.editableWorkout.id).subscribe({
-          next: () => {
-            console.log('Workout deleted');
-            this.workout = null;
-            this.workoutUpdated.emit(null);
-          },
-          error: (err) => {
-            console.error('Error deleting workout:', err);
-          },
-        });
-      }
-    }
+    this.delete.emit(this.editableWorkout);
   }
 }
