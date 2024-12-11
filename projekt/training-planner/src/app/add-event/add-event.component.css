@@ -112,3 +112,7 @@
   margin-top: 10px;
 }
 
+small {
+  color: red;
+  font-size: 12px;
+}

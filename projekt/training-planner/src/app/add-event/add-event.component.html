@@ -6,60 +6,99 @@
 <div class="modal-overlay" *ngIf="showPlanForm">
   <div class="modal-content">
     <h3>Add New Training Plan</h3>
-    <label>
-      Plan Name:
-      <input type="text" [(ngModel)]="newPlanName" />
-    </label>
-    <label>
-      Start Date:
-      <input type="date" [(ngModel)]="newPlanStartDate" />
-    </label>
-    <label>
-      End Date:
-      <input type="date" [(ngModel)]="newPlanEndDate" />
-    </label>
-    <button (click)="addNewPlan()">Add Training Plan</button>
-    <button class="close-button" (click)="showPlanForm = false">Close</button>
+    <form [formGroup]="planForm" (ngSubmit)="addNewPlan()">
+      <label>
+        Plan Name:
+        <input type="text" formControlName="newPlanName" />
+        <div *ngIf="planForm.controls['newPlanName'].invalid && planForm.controls['newPlanName'].touched">
+          <small *ngIf="planForm.controls['newPlanName'].hasError('required')">Plan Name is required.</small>
+        </div>
+      </label>
+
+      <label>
+        Start Date:
+        <input type="date" formControlName="newPlanStartDate" />
+        <div *ngIf="planForm.controls['newPlanStartDate'].invalid && planForm.controls['newPlanStartDate'].touched">
+          <small *ngIf="planForm.controls['newPlanStartDate'].hasError('required')">Start Date is required.</small>
+        </div>
+      </label>
+
+      <label>
+        End Date:
+        <input type="date" formControlName="newPlanEndDate" />
+        <div *ngIf="planForm.controls['newPlanEndDate'].invalid && planForm.controls['newPlanEndDate'].touched">
+          <small *ngIf="planForm.controls['newPlanEndDate'].hasError('required')">End Date is required.</small>
+        </div>
+      </label>
+
+      <button type="submit" [disabled]="planForm.invalid">Add Training Plan</button>
+      <button class="close-button" (click)="showPlanForm = false">Close</button>
+    </form>
   </div>
 </div>
 
 <div class="modal-overlay" *ngIf="showEventForm">
   <div class="modal-content">
     <h3>Add New Workout</h3>
-    <label>
-      Workout Name:
-      <input type="text" [(ngModel)]="title" />
-    </label>
-    <label>
-      Date:
-      <input type="date" [(ngModel)]="date" (ngModelChange)="filterPlansByDate()" />
-    </label>
-    <label>
-      Select Training Plan:
-      <select [(ngModel)]="selectedPlanId">
-        <option *ngFor="let plan of activePlans" [value]="plan.id">
-          {{ plan.name }}
-        </option>
-      </select>
-      <p *ngIf="activePlans.length === 0">
-        No training plans available for the selected date
-      </p>
-    </label>
-    
-    
-    <label>
-      Duration (minutes):
-      <input type="number" [(ngModel)]="duration" />
-    </label>
-    <label>
-      Intensity:
-      <input type="number" [(ngModel)]="intensity" />
-    </label>
-    <label>
-      Description:
-      <textarea [(ngModel)]="description"></textarea>
-    </label>
-    <button (click)="addEvent()">Add Workout</button>
-    <button class="close-button" (click)="showEventForm = false">Close</button>
+    <form [formGroup]="eventForm" (ngSubmit)="addEvent()">
+      <label>
+        Workout Name:
+        <input type="text" formControlName="title" />
+        <div *ngIf="eventForm.controls['title'].invalid && eventForm.controls['title'].touched">
+          <small *ngIf="eventForm.controls['title'].hasError('required')">Workout Name is required.</small>
+        </div>
+      </label>
+
+      <label>
+        Date:
+        <input type="date" formControlName="date" (ngModelChange)="filterPlansByDate()" />
+        <div *ngIf="eventForm.controls['date'].invalid && eventForm.controls['date'].touched">
+          <small *ngIf="eventForm.controls['date'].hasError('required')">Date is required.</small>
+        </div>
+      </label>
+
+      <label>
+        Select Training Plan:
+        <select formControlName="selectedPlanId">
+          <option *ngFor="let plan of activePlans" [value]="plan.id">
+            {{ plan.name }}
+          </option>
+        </select>
+        <small *ngIf="activePlans.length === 0">
+          No training plans available for the selected date.
+        </small>
+        <div *ngIf="activePlans.length > 0 && eventForm.controls['selectedPlanId'].invalid && eventForm.controls['selectedPlanId'].touched">
+          <small *ngIf="eventForm.controls['selectedPlanId'].hasError('required')">
+            Please select a training plan.
+          </small>
+        </div>
+      </label>
+      
+
+      <label>
+        Duration (minutes):
+        <input type="number" formControlName="duration" />
+        <div *ngIf="eventForm.controls['duration'].invalid && eventForm.controls['duration'].touched">
+          <small *ngIf="eventForm.controls['duration'].hasError('required')">Duration is required.</small>
+          <small *ngIf="eventForm.controls['duration'].hasError('min')">Duration must be at least 1 minute.</small>
+        </div>
+      </label>
+
+      <label>
+        Intensity:
+        <input type="number" formControlName="intensity" />
+        <div *ngIf="eventForm.controls['intensity'].invalid && eventForm.controls['intensity'].touched">
+          <small *ngIf="eventForm.controls['intensity'].hasError('intensityRange')">Intensity must be between 1 and 10.</small>
+        </div>
+      </label>
+
+      <label>
+        Description:
+        <textarea formControlName="description"></textarea>
+      </label>
+
+      <button (click)="showWorkoutForm()">Add New Workout</button>
+      <button class="close-button" (click)="showEventForm = false; eventForm.reset()">Close</button>
+    </form>
   </div>
 </div>

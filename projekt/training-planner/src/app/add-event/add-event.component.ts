@@ -1,43 +1,52 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CalendarEventService } from '../services/calendar-event.service';
 import { TrainingPlanService } from '../services/training-plan.service';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { intensityRangeValidator } from '../validators/intensity-range.validator';
 @Component({
   standalone: true,
   selector: 'app-add-event',
   templateUrl: './add-event.component.html',
   styleUrls: ['./add-event.component.css'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AddEventComponent implements OnInit {
   @Output() planAdded = new EventEmitter<void>();
   @Output() workoutAdded = new EventEmitter<void>();
-  title = '';
-  date = '';
-  selectedPlanId: string = '';
-  duration: number | null = null;
-  intensity: number | null = null;
-  description = '';
+
+  eventForm: FormGroup;
+  planForm: FormGroup;
   activePlans: any[] = [];
-  newPlanName = '';
-  newPlanStartDate = '';
-  newPlanEndDate = '';
+  allPlans: any[] = [];
 
   showPlanForm: boolean = false;
   showEventForm: boolean = false;
 
   constructor(
     private eventService: CalendarEventService,
-    private planService: TrainingPlanService
-  ) {}
+    private planService: TrainingPlanService,
+    private fb: FormBuilder
+  ) {
+    this.eventForm = this.fb.group({
+      title: ['', Validators.required],
+      date: ['', Validators.required],
+      selectedPlanId: ['', Validators.required],
+      duration: [null, [Validators.required, Validators.min(1)]],
+      intensity: [null, [Validators.required, intensityRangeValidator()]],
+      description: [''],
+    });
+
+    this.planForm = this.fb.group({
+      newPlanName: ['', Validators.required],
+      newPlanStartDate: ['', Validators.required],
+      newPlanEndDate: ['', Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.loadActivePlans();
   }
-
-  allPlans: any[] = [];
 
   loadActivePlans(): void {
     this.planService.getActiveTrainingPlans('').subscribe({
@@ -45,119 +54,94 @@ export class AddEventComponent implements OnInit {
         this.allPlans = plans;
         this.activePlans = plans;
       },
-      error: (err) => {
-        console.error('Error fetching active plans:', err);
-      },
     });
   }
 
   filterPlansByDate(): void {
-    if (!this.date) {
+    if (!this.eventForm.controls['date'].value) {
       this.activePlans = this.allPlans;
       return;
     }
-    const selectedDate = new Date(this.date);
+    const selectedDate = new Date(this.eventForm.controls['date'].value);
     this.activePlans = this.allPlans.filter((plan) => {
       const startDate = new Date(plan.startDate);
       const endDate = new Date(plan.endDate);
-
       return selectedDate >= startDate && selectedDate <= endDate;
     });
   }
 
   addEvent(): void {
-    if (
-      this.title &&
-      this.date &&
-      this.selectedPlanId &&
-      this.duration &&
-      this.intensity
-    ) {
-      const selectedPlan = this.activePlans.find(
-        (plan) => plan.id === +this.selectedPlanId
-      );
-
-      if (!selectedPlan) {
-        console.error('Selected plan not found.');
-        return;
-      }
-
-      const newEvent = {
-        title: this.title,
-        date: this.date,
-        trainingPlanId: this.selectedPlanId,
-        duration: this.duration,
-        intensity: this.intensity,
-        description: this.description,
-      };
-
-      console.log('Adding new event:', newEvent);
-
-      this.eventService.addEvent(newEvent).subscribe({
-        next: () => {
-          console.log('Event added successfully.');
-          this.resetEventForm();
-          this.workoutAdded.emit();
-          this.showEventForm = false;
-        },
-        error: (err) => {
-          console.error('Error adding event:', err);
-        },
-      });
-    } else {
-      console.error('Missing required fields for event:', {
-        title: this.title,
-        date: this.date,
-        selectedPlanId: this.selectedPlanId,
-        duration: this.duration,
-        intensity: this.intensity,
-      });
+    if (this.eventForm.invalid) {
+      this.eventForm.markAllAsTouched();
+      return;
     }
+
+    const formValues = this.eventForm.value;
+    const selectedPlan = this.activePlans.find(
+      (plan) => plan.id === +formValues.selectedPlanId 
+    );
+
+    if (!selectedPlan) {
+      return; 
+    }
+
+    const newEvent = {
+      title: formValues.title,
+      date: formValues.date,
+      trainingPlanId: formValues.selectedPlanId,
+      duration: formValues.duration,
+      intensity: formValues.intensity,
+      description: formValues.description,
+    };
+
+    this.eventService.addEvent(newEvent).subscribe({
+      next: () => {
+        this.resetEventForm();
+        this.workoutAdded.emit();
+        this.showEventForm = false;
+      },
+    });
   }
 
   addNewPlan(): void {
-    if (this.newPlanName && this.newPlanStartDate && this.newPlanEndDate) {
-      const newPlan = {
-        name: this.newPlanName,
-        startDate: this.newPlanStartDate,
-        endDate: this.newPlanEndDate,
-      };
-
-      console.log('Adding new training plan:', newPlan);
-
-      this.planService.createTrainingPlan(newPlan).subscribe({
-        next: () => {
-          console.log('New training plan added successfully.');
-          this.resetPlanForm();
-          this.loadActivePlans();
-          this.showPlanForm = false;
-          this.planAdded.emit();
-        },
-        error: (err) => {
-          console.error('Error adding new training plan:', err);
-        },
-      });
-    } else {
-      console.error('Missing required fields for new plan:', {
-        newPlanName: this.newPlanName,
-        newPlanStartDate: this.newPlanStartDate,
-        newPlanEndDate: this.newPlanEndDate,
-      });
+    if (this.planForm.invalid) {
+      this.planForm.markAllAsTouched();
+      return;
     }
+
+    const formValues = this.planForm.value;
+
+    const newPlan = {
+      name: formValues.newPlanName,
+      startDate: formValues.newPlanStartDate,
+      endDate: formValues.newPlanEndDate,
+    };
+
+    this.planService.createTrainingPlan(newPlan).subscribe({
+      next: () => {
+        this.resetPlanForm();
+        this.loadActivePlans();
+        this.showPlanForm = false;
+        this.planAdded.emit();
+      },
+    });
+  }
+
+  showTrainingPlanForm(): void {
+    this.showPlanForm = true;
+    this.planForm.markAllAsTouched();
+  }
+
+  showWorkoutForm(): void {
+    this.showEventForm = true;
+    this.eventForm.markAllAsTouched(); 
   }
 
   private resetEventForm(): void {
-    this.title = '';
-    this.date = '';
-    this.selectedPlanId = '';
-    this.duration = null;
-    this.intensity = null;
-    this.description = '';
+    this.eventForm.reset();
   }
 
   private resetPlanForm(): void {
-    this.newPlanName = '';
-    this.newPlanStartDate = '';
-    this.newPlanEndDate = '';
+    this.planForm.reset();
   }
 }
