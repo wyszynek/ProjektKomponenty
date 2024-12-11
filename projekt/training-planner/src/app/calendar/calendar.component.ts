@@ -12,6 +12,7 @@ import { EditWorkoutComponent } from '../edit-event/edit-event.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { NONE_TYPE } from '@angular/compiler';
+import { AddEventComponent } from "../add-event/add-event.component";
 
 @Component({
   standalone: true,
@@ -24,7 +25,8 @@ import { NONE_TYPE } from '@angular/compiler';
     EditWorkoutComponent,
     CommonModule,
     HttpClientModule,
-  ],
+    AddEventComponent
+],
 })
 export class CalendarComponent implements OnInit {
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
@@ -64,6 +66,18 @@ export class CalendarComponent implements OnInit {
   ngOnInit(): void {
     this.loadTrainingPlans();
     this.subscribeToNewEvents();
+    this.refreshPlans();
+  }
+
+  refreshPlans(): void {
+    this.trainingPlanService.getActiveTrainingPlans('').subscribe({
+      next: (plans) => {
+        this.trainingPlans = plans;
+      },
+      error: (err) => {
+        console.error('Error fetching plans:', err);
+      },
+    });
   }
 
   loadTrainingPlans(): void {
@@ -201,28 +215,30 @@ export class CalendarComponent implements OnInit {
 
   handleDeleteWorkout(workout: any): void {
     if (confirm('Are you sure you want to delete this workout?')) {
-      this.eventService.deleteWorkout(workout.trainingPlanId, workout.id).subscribe(
-        () => {
-          // Po pomyślnym usunięciu, zamykamy modal i usuwamy event z kalendarza
-          console.log('Workout deleted successfully');
-          this.isEditModalOpen = false;
-    
-          // Usuwamy wydarzenie z kalendarza
-          const calendarApi = this.calendarComponent.getApi();
-          const event = calendarApi.getEventById(workout.workoutId); // Pobieramy wydarzenie po ID
-          if (event) {
-            event.remove(); // Usuwamy wydarzenie z kalendarza
+      this.eventService
+        .deleteWorkout(workout.trainingPlanId, workout.id)
+        .subscribe(
+          () => {
+            // Po pomyślnym usunięciu, zamykamy modal i usuwamy event z kalendarza
+            console.log('Workout deleted successfully');
+            this.isEditModalOpen = false;
+
+            // Usuwamy wydarzenie z kalendarza
+            const calendarApi = this.calendarComponent.getApi();
+            const event = calendarApi.getEventById(workout.workoutId); // Pobieramy wydarzenie po ID
+            if (event) {
+              event.remove(); // Usuwamy wydarzenie z kalendarza
+            }
+
+            this.selectedWorkout = null;
+            this.loadTrainingPlans();
+            this.isEditModalOpen = false;
+          },
+          (error) => {
+            console.error('Error deleting workout:', error);
+            // Obsługa błędów
           }
-    
-          this.selectedWorkout = null;
-          this.loadTrainingPlans();
-          this.isEditModalOpen = false;
-        },
-        (error) => {
-          console.error('Error deleting workout:', error);
-          // Obsługa błędów
-        }
-      );
+        );
     }
   }
 
@@ -282,7 +298,7 @@ export class CalendarComponent implements OnInit {
     console.log('Start:', plan.startDate);
     console.log('End:', plan.endDate);
     // Ustawia wybrany plan, który zostanie edytowany w komponencie EditWorkoutComponent
-    this.selectedPlan = { ...plan };  // Tworzymy kopię planu, aby nie modyfikować oryginału
+    this.selectedPlan = { ...plan }; // Tworzymy kopię planu, aby nie modyfikować oryginału
   }
 
   handleSaveEditPlan(updatedPlan: any): void {
@@ -292,7 +308,7 @@ export class CalendarComponent implements OnInit {
       next: () => {
         console.log('Plan zaktualizowany');
         this.selectedPlan = null;
-        this.loadTrainingPlans(); 
+        this.loadTrainingPlans();
       },
       error: (err) => console.error('Błąd aktualizacji planu:', err),
     });
@@ -305,7 +321,7 @@ export class CalendarComponent implements OnInit {
           // Po pomyślnym usunięciu, zamykamy modal i usuwamy event z kalendarza
           console.log('Workout deleted successfully');
           this.isEditModalOpen = false;
-    
+
           this.selectedPlan = null;
           this.loadTrainingPlans();
           this.isEditModalOpen = false;
