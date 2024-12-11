@@ -33,7 +33,7 @@ export class AddEventComponent implements OnInit {
       date: ['', Validators.required],
       selectedPlanId: ['', Validators.required],
       duration: [null, [Validators.required, Validators.min(1)]],
-      intensity: [null, [Validators.required, intensityRangeValidator()]],
+      intensity: [null, [Validators.required, intensityRangeValidator(1,10)]],
       description: [''],
     });
 
