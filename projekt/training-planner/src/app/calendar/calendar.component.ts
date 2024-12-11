@@ -12,7 +12,7 @@ import { EditWorkoutComponent } from '../edit-event/edit-event.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { NONE_TYPE } from '@angular/compiler';
-import { AddEventComponent } from "../add-event/add-event.component";
+import { AddEventComponent } from '../add-event/add-event.component';
 
 @Component({
   standalone: true,
@@ -25,8 +25,8 @@ import { AddEventComponent } from "../add-event/add-event.component";
     EditWorkoutComponent,
     CommonModule,
     HttpClientModule,
-    AddEventComponent
-],
+    AddEventComponent,
+  ],
 })
 export class CalendarComponent implements OnInit {
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;

@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddEventComponent implements OnInit {
   @Output() planAdded = new EventEmitter<void>();
+  @Output() workoutAdded = new EventEmitter<void>();
   title = '';
   date = '';
   selectedPlanId: string = '';
@@ -82,7 +83,7 @@ export class AddEventComponent implements OnInit {
       }
 
       const newEvent = {
-        title: `${selectedPlan.name}: ${this.title}`,
+        title: this.title,
         date: this.date,
         trainingPlanId: this.selectedPlanId,
         duration: this.duration,
@@ -93,18 +94,10 @@ export class AddEventComponent implements OnInit {
       console.log('Adding new event:', newEvent);
 
       this.eventService.addEvent(newEvent).subscribe({
-        next: (response) => {
+        next: () => {
           console.log('Event added successfully.');
           this.resetEventForm();
-          this.eventService.emitNewEvent({
-            id: response.id,
-            title: newEvent.title,
-            date: newEvent.date,
-            trainingPlanId: newEvent.trainingPlanId,
-            duration: newEvent.duration,
-            intensity: newEvent.intensity,
-            description: newEvent.description,
-          });
+          this.workoutAdded.emit();
           this.showEventForm = false;
         },
         error: (err) => {

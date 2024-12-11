@@ -1,6 +1,6 @@
 <h1 class="display-3 text-center text-uppercase text-gradient mb-4">Training Planner</h1>
 
-<app-add-event (planAdded)="refreshPlans()"></app-add-event>
+<app-add-event (planAdded)="refreshPlans()" (workoutAdded)="loadTrainingPlans()" ></app-add-event>
 <div class="filter-container mb-3" id="calendar">
     <label for="planFilter" class="form-label">Choose plan:</label>
     <select id="planFilter" class="form-select" (change)="filterTrainingPlans($event)">
