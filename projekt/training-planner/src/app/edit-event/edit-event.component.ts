@@ -175,6 +175,21 @@ export class EditWorkoutComponent implements OnInit {
   }
 
   savePlan(): void {
+    if (this.editablePlan.startDate > this.editablePlan.endDate) {
+      alert('Start date can`t be later than end date.');
+      return;
+    }
+
+    if (this.editablePlan.startDate == null ||  this.editablePlan.endDate == null) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
+    if (this.editablePlan.name == "") {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
     this.save.emit(this.editablePlan);
   }
 

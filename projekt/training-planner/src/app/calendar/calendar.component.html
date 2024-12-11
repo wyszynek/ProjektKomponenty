@@ -21,14 +21,24 @@
                   (save)="handleSaveEdit($event)"
                   (delete)="handleDeleteWorkout($event)">
 </app-edit-workout>
+
 <div *ngIf="trainingPlans.length > 0" class="plans-table">
   <h3>Available Training Plans</h3>
   <table>
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Start</th>
-        <th>End</th>
+        <th (click)="sortTable('name')">
+          Name 
+          <span [class]="getSortIcon('name')"></span>
+        </th>
+        <th (click)="sortTable('startDate')">
+          Start 
+          <span [class]="getSortIcon('startDate')"></span>
+        </th>
+        <th (click)="sortTable('endDate')">
+          End 
+          <span [class]="getSortIcon('endDate')"></span>
+        </th>
       </tr>
     </thead>
     <tbody>

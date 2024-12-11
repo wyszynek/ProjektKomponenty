@@ -135,39 +135,14 @@ tr:hover {
   font-size: 16px;
 }
 
-
-.action-buttons {
-  display: flex;
-  gap: 15px; /* Odstęp między przyciskami */
-  justify-content: center; /* Wyśrodkowanie przycisków w komórce */
-  align-items: center; /* Wyrównanie w pionie */
+.sort-asc-icon::after {
+  content: '▲'; /* Strzałka w górę */
+  font-size: 10px;
+  margin-left: 5px;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 14px; /* Nieco mniejszy tekst dla spójności */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: bold;
-}
-
-.edit-btn {
-  background-color: #00aaff;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #099ae2;
-}
-
-.delete-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #d32f2f;
+.sort-desc-icon::after {
+  content: '▼'; /* Strzałka w dół */
+  font-size: 10px;
+  margin-left: 5px;
 }

@@ -392,4 +392,36 @@ export class CalendarComponent implements OnInit {
     const calendarApi = this.calendarComponent.getApi();
     calendarApi.refetchEvents();
   }
+
+  sortState: { [key: string]: 'asc' | 'desc' | null } = {
+    name: null,
+    startDate: null,
+    endDate: null
+  };
+
+  sortTable(field: string) {
+    const currentDirection = this.sortState[field];
+    // Resetuj sortowanie dla innych kolumn
+    Object.keys(this.sortState).forEach(key => {
+      this.sortState[key] = key === field ? (currentDirection === 'asc' ? 'desc' : 'asc') : null;
+    });
+
+    const sortDirection = this.sortState[field];
+
+    this.trainingPlans.sort((a, b) => {
+      const valueA = a[field];
+      const valueB = b[field];
+
+      if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  getSortIcon(field: string): string {
+    const direction = this.sortState[field];
+    if (direction === 'asc') return 'sort-asc-icon';
+    if (direction === 'desc') return 'sort-desc-icon';
+    return '';
+  }
 }
