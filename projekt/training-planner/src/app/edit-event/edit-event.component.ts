@@ -15,13 +15,16 @@ export class EditWorkoutComponent implements OnInit {
   @Input() workout: any; // Otrzymuje dane treningu
   @Input() plan: any;
   @Output() cancel = new EventEmitter<void>(); // Emituje anulowanie edycji
-  @Output() save = new EventEmitter<any>(); // Emituje zapisanie edytowanego treningu
+  @Output() save = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
 
   availablePlans: any[] = [];
   originalTrainingPlanId: number | undefined;
   editableWorkout: any = {};
   editablePlan: any = {};
+
+  selectedStartDate: any;
+  selectedEndDate: any;
 
   constructor(private eventService: CalendarEventService, private trainingPlanService: TrainingPlanService) {}
 
@@ -60,17 +63,11 @@ export class EditWorkoutComponent implements OnInit {
     });
   }
 
-  
+
   //Kiedy użytkownik zmienia tekst w jakimś polu, zdarzenie input jest wywoływane.
   //event.target odnosi się do elementu <input>, który został zmodyfikowany.
   //Za pomocą inputElement.value, otrzymujemy wartość wpisaną przez użytkownika.
   //Bez tych metod, zmiany w formularzu nie byłyby automatycznie przekazywane do modelu.
-
-  onTrainingPlanChange(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    const selectedPlanId = parseInt(selectElement.value, 10);
-    this.editableWorkout.trainingPlanId = isNaN(selectedPlanId) ? null : selectedPlanId;
-  }
 
   onTrainingTypeInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
@@ -105,6 +102,11 @@ export class EditWorkoutComponent implements OnInit {
       return;
     }
 
+    if (this.editableWorkout.trainingType == "") {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
     if (this.editableWorkout.intensity == null || this.editableWorkout.intensity > 10 || this.editableWorkout.intensity < 1) {
       alert('Please fill in all required fields correctly.');
       return;
@@ -115,13 +117,37 @@ export class EditWorkoutComponent implements OnInit {
       return;
     }
 
-    const workoutToSave = {
-      ...this.editableWorkout,
-      originalTrainingPlanId: this.originalTrainingPlanId,
-      updatedTrainingPlanId: this.editableWorkout.trainingPlanId,
-    };
+    this.trainingPlanService.getPlan(this.editableWorkout.trainingPlanId).subscribe({
+      next: (plan) => {
+        this.selectedStartDate = new Date(plan.startDate);
+        this.selectedEndDate = new Date(plan.endDate); 
 
-    this.save.emit(workoutToSave);
+        const workoutDate = new Date(this.editableWorkout.date);
+
+        this.selectedStartDate.setHours(0, 0, 0, 0);
+        this.selectedEndDate.setHours(0, 0, 0, 0);
+        workoutDate.setHours(0, 0, 0, 0);
+
+        if (workoutDate < this.selectedStartDate || workoutDate > this.selectedEndDate) {
+          alert('The date does not fit within the plan`s period of operation.');
+          return;
+        }
+  
+        const workoutToSave = {
+          ...this.editableWorkout,
+          originalTrainingPlanId: this.originalTrainingPlanId,
+          updatedTrainingPlanId: this.editableWorkout.trainingPlanId,
+        };
+  
+        this.save.emit(workoutToSave);
+        this.selectedStartDate = null;
+        this.selectedEndDate = null;
+      },
+      error: (err) => {
+        console.error('Error fetching plan:', err);
+        alert('Failed to fetch the training plan. Please try again.');
+      }
+    });
   }
 
   cancelEdit(): void {

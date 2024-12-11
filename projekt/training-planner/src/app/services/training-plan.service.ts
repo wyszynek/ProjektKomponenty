@@ -29,4 +29,8 @@ export class TrainingPlanService {
   deleteTrainingPlan(plan: any): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${plan.id}`, plan);
   }
+
+  getPlan(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
 }
