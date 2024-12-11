@@ -21,3 +21,39 @@
                   (delete)="handleDeleteWorkout($event)">
 </app-edit-workout>
 
+<div *ngIf="trainingPlans.length > 0" class="plans-table">
+  <h3>Available Training Plans</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let plan of trainingPlans">
+        <td>{{ plan.name }}</td>
+        <td>{{ plan.startDate | date:'dd-MM-yyyy' }}</td>
+        <td>{{ plan.endDate | date:'dd-MM-yyyy' }}</td>
+        <td>
+          <div class="action-buttons">
+            <button type="button" class="edit-btn" (click)="onEdit(plan)">Edit</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="trainingPlans.length === 0" class="no-plans">
+  <p>No training plans available.</p>
+</div>
+
+<app-edit-workout *ngIf="selectedPlan"
+      [plan]="selectedPlan"
+      (cancel)="handleCancelEditPlan()"
+      (save)="handleSaveEditPlan($event)"
+      (delete)="handleDeletePlan($event)">
+</app-edit-workout>

@@ -13,6 +13,7 @@ import { TrainingPlanService } from '../services/training-plan.service';
 })
 export class EditWorkoutComponent implements OnInit {
   @Input() workout: any; // Otrzymuje dane treningu
+  @Input() plan: any;
   @Output() cancel = new EventEmitter<void>(); // Emituje anulowanie edycji
   @Output() save = new EventEmitter<any>(); // Emituje zapisanie edytowanego treningu
   @Output() delete = new EventEmitter<any>();
@@ -20,13 +21,27 @@ export class EditWorkoutComponent implements OnInit {
   availablePlans: any[] = [];
   originalTrainingPlanId: number | undefined;
   editableWorkout: any = {};
+  editablePlan: any = {};
 
   constructor(private eventService: CalendarEventService, private trainingPlanService: TrainingPlanService) {}
 
+  formatDate(date: string): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  }
+
   ngOnInit(): void {
     this.loadTrainingPlans();
-    this.originalTrainingPlanId = this.workout.trainingPlanId;
-    this.editableWorkout = { ...this.workout };
+    if (this.workout) {
+      this.originalTrainingPlanId = this.workout.trainingPlanId;
+      this.editableWorkout = { ...this.workout };
+    } else if (this.plan) {
+      this.editablePlan = { 
+        ...this.plan,
+        startDate: this.formatDate(this.plan.startDate),
+        endDate: this.formatDate(this.plan.endDate)
+      };
+    }
   }
 
   loadTrainingPlans(): void {
@@ -35,6 +50,8 @@ export class EditWorkoutComponent implements OnInit {
         this.availablePlans = plans.map((plan: any) => ({
           id: plan.id,
           name: plan.name,
+          startDate: plan.startDate,
+          endDate: plan.endDate
         }));
       },
       error: (err) => {
@@ -43,6 +60,7 @@ export class EditWorkoutComponent implements OnInit {
     });
   }
 
+  
   //Kiedy użytkownik zmienia tekst w jakimś polu, zdarzenie input jest wywoływane.
   //event.target odnosi się do elementu <input>, który został zmodyfikowany.
   //Za pomocą inputElement.value, otrzymujemy wartość wpisaną przez użytkownika.
@@ -112,5 +130,30 @@ export class EditWorkoutComponent implements OnInit {
 
   deleteWorkout(): void {
     this.delete.emit(this.editableWorkout);
+  }
+
+
+  onNameChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editablePlan.name = inputElement.value.trim();
+  }
+  
+  onStartDateChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editablePlan.startDate = inputElement.value;
+  }
+  
+  onEndDateChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.editablePlan.startDate = inputElement.value;
+  }
+
+  savePlan(): void {
+    this.save.emit(this.editablePlan);
+  }
+
+  deletePlan(): void {
+    console.log('Deleting plan:', this.editablePlan);
+    this.delete.emit(this.editablePlan);
   }
 }

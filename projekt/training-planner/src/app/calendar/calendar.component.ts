@@ -54,6 +54,8 @@ export class CalendarComponent implements OnInit {
   trainingPlans: any[] = [];
   selectedPlanIds: string[] = [];
 
+  selectedPlan: any = null;
+
   constructor(
     private trainingPlanService: TrainingPlanService,
     private eventService: CalendarEventService,
@@ -268,6 +270,51 @@ export class CalendarComponent implements OnInit {
             console.error('Error updating workout:', err);
           },
         });
+    }
+  }
+
+  handleCancelEditPlan(): void {
+    this.selectedPlan = null;
+    this.isEditModalOpen = false;
+  }
+
+  onEdit(plan: any): void {
+    console.log('Start:', plan.startDate);
+    console.log('End:', plan.endDate);
+    // Ustawia wybrany plan, który zostanie edytowany w komponencie EditWorkoutComponent
+    this.selectedPlan = { ...plan };  // Tworzymy kopię planu, aby nie modyfikować oryginału
+  }
+
+  handleSaveEditPlan(updatedPlan: any): void {
+    console.log('Zapisano plan:', updatedPlan);
+
+    this.trainingPlanService.updateTrainingPlan(updatedPlan).subscribe({
+      next: () => {
+        console.log('Plan zaktualizowany');
+        this.selectedPlan = null;
+        this.loadTrainingPlans(); 
+      },
+      error: (err) => console.error('Błąd aktualizacji planu:', err),
+    });
+  }
+
+  handleDeletePlan(plan: any): void {
+    if (confirm('Are you sure you want to delete this workout?')) {
+      this.trainingPlanService.deleteTrainingPlan(plan).subscribe(
+        () => {
+          // Po pomyślnym usunięciu, zamykamy modal i usuwamy event z kalendarza
+          console.log('Workout deleted successfully');
+          this.isEditModalOpen = false;
+    
+          this.selectedPlan = null;
+          this.loadTrainingPlans();
+          this.isEditModalOpen = false;
+        },
+        (error) => {
+          console.error('Error deleting workout:', error);
+          // Obsługa błędów
+        }
+      );
     }
   }
 

@@ -102,20 +102,17 @@ app.get("/plans/active", async (req, res) => {
 });
 
 app.get("/plans/:id", async (req, res) => {
-  const { id } = req.params; // Pobieramy id z parametrów URL
+  const { id } = req.params; 
 
   try {
-    // Szukamy planu treningowego o konkretnym id
     const plan = await TrainingPlan.findByPk(id, {
-      include: Workout, // Dołączamy workouty do planu
+      include: Workout, 
     });
 
-    // Jeśli plan nie istnieje, zwracamy błąd 404
     if (!plan) {
       return res.status(404).send("Training plan not found");
     }
 
-    // Jeśli plan istnieje, zwracamy go wraz z jego workoutami
     res.status(200).json(plan);
   } catch (err) {
     console.error("Error fetching plan:", err);
@@ -124,21 +121,19 @@ app.get("/plans/:id", async (req, res) => {
 });
 
 app.get("/plans/:planId/workouts/:workoutId", async (req, res) => {
-  const { planId, workoutId } = req.params; // Pobieramy planId i workoutId z parametrów URL
+  const { planId, workoutId } = req.params; 
 
   try {
-    // Szukamy planu na podstawie planId
     const plan = await TrainingPlan.findByPk(planId);
 
     if (!plan) {
       return res.status(404).send("Training plan not found");
     }
 
-    // Szukamy workoutu na podstawie workoutId i związania z planem
     const workout = await Workout.findOne({
       where: {
         id: workoutId,
-        trainingPlanId: planId, // Upewniamy się, że workout należy do tego planu
+        trainingPlanId: planId, 
       },
     });
 
@@ -146,7 +141,6 @@ app.get("/plans/:planId/workouts/:workoutId", async (req, res) => {
       return res.status(404).send("Workout not found for this plan");
     }
 
-    // Jeśli workout istnieje, zwracamy go
     res.status(200).json(workout);
   } catch (err) {
     console.error("Error fetching workout:", err);
@@ -154,6 +148,7 @@ app.get("/plans/:planId/workouts/:workoutId", async (req, res) => {
   }
 });
 
+// edycja workoutu bez przeniesienia
 app.put("/plans/:planId/workouts/:workoutId", async (req, res) => {
   const { planId, workoutId } = req.params;
   const { trainingType, date, duration, intensity, description } = req.body;
@@ -185,8 +180,9 @@ app.put("/plans/:planId/workouts/:workoutId", async (req, res) => {
   }
 });
 
+// usuniecie workoutu
 app.delete("/plans/:planId/workouts/:workoutId", async (req, res) => {
-  const { planId, workoutId } = req.params; // Pobieramy id planu i treningu z parametrów URL
+  const { planId, workoutId } = req.params;
 
   try {
     const plan = await TrainingPlan.findByPk(planId);
@@ -209,44 +205,6 @@ app.delete("/plans/:planId/workouts/:workoutId", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-app.put(
-  "/plans/:originalTrainingPlanId/workouts/:workoutId/move/:updatedTrainingPlanId",
-  async (req, res) => {
-    const { originalTrainingPlanId, workoutId, updatedTrainingPlanId } =
-      req.params;
-    const { trainingType, date, duration, intensity, description } = req.body;
-
-    try {
-      // Znajdź workout w bazie po workoutId i originalTrainingPlanId
-      const workout = await Workout.findOne({
-        where: { id: workoutId, trainingPlanId: originalTrainingPlanId },
-      });
-
-      if (!workout) {
-        return res
-          .status(404)
-          .json({ message: "Workout not found in the original training plan" });
-      }
-
-      // Zaktualizuj workout, przenosząc go do nowego planu
-      workout.trainingPlanId = updatedTrainingPlanId; // Zmień ID planu
-      workout.trainingType = trainingType || workout.trainingType;
-      workout.date = date || workout.date;
-      workout.duration = duration || workout.duration;
-      workout.intensity = intensity || workout.intensity;
-      workout.description = description || workout.description;
-
-      // Zapisz zmiany w bazie
-      await workout.save();
-
-      return res.status(200).json(workout);
-    } catch (err) {
-      console.error("Error updating workout:", err);
-      return res.status(500).json({ message: "Server error" });
-    }
-  }
-);
 
 app.put("/plans/:planId/workouts/:workoutId/date", async (req, res) => {
   let { planId, workoutId } = req.params;
@@ -328,6 +286,7 @@ app.put('/plans/:planId/workouts/:workoutId/date', async (req, res) => {
     }
 });
 
+// edycja workoutu z przeniesieniem do innego planu
 app.put('/plans/:originalTrainingPlanId/workouts/:workoutId/move/:updatedTrainingPlanId', async (req, res) => {
     const { originalTrainingPlanId, workoutId, updatedTrainingPlanId } = req.params;
     const { trainingType, date, duration, intensity, description } = req.body;
@@ -356,6 +315,61 @@ app.put('/plans/:originalTrainingPlanId/workouts/:workoutId/move/:updatedTrainin
         console.error('Error updating workout:', err);
         return res.status(500).json({ message: 'Server error' });
     }
+});
+
+
+// edycja planu
+app.put("/plans/:planId", async (req, res) => {
+  const { planId } = req.params; 
+  const { name, startDate, endDate } = req.body; 
+
+  // Walidacja danych wejściowych
+  if (!name || !startDate || !endDate) {
+    return res
+      .status(400)
+      .send("Missing required fields: name, startDate, endDate");
+  }
+
+  try {
+    const plan = await TrainingPlan.findByPk(planId);
+
+    if (!plan) {
+      return res.status(404).send("Training plan not found");
+    }
+
+    plan.name = name;
+    plan.startDate = startDate;
+    plan.endDate = endDate;
+
+    await plan.save();
+
+    res.status(200).json(plan);
+  } catch (err) {
+    console.error("Error updating plan:", err);
+    res.status(500).send("Could not update plan");
+  }
+});
+
+// usuniecie planu
+app.delete("/plans/:planId", async (req, res) => {
+  const { planId } = req.params; 
+
+  try {
+    const plan = await TrainingPlan.findByPk(planId);
+
+    if (!plan) {
+      return res.status(404).json({ message: "Training plan not found" });
+    }
+
+    await Workout.destroy({ where: { trainingPlanId: planId } });
+
+    await plan.destroy();
+
+    res.status(200).json({ message: "Training plan and associated workouts deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting plan:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.listen(PORT, () => {

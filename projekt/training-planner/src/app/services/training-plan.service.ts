@@ -21,4 +21,12 @@ export class TrainingPlanService {
   createTrainingPlan(plan: { name: string; startDate: string; endDate: string }): Observable<any> {
     return this.http.post(this.apiUrl, plan);
   }
+
+  updateTrainingPlan(plan: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${plan.id}`, plan);
+  }
+
+  deleteTrainingPlan(plan: any): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${plan.id}`, plan);
+  }
 }
