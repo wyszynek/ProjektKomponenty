@@ -1,0 +1,22 @@
+<h2>Lista Planów Treningowych</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Nazwa</th>
+      <th>Data Początku</th>
+      <th>Data Końca</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let plan of trainingPlans">
+      <td>{{ plan.name }}</td>
+      <td>{{ plan.startDate | date }}</td>
+      <td>{{ plan.endDate | date }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<app-edit-workout *ngIf="selectedPlan"
+      [plan]="selectedPlan"
+      >
+</app-edit-workout>

@@ -4,6 +4,7 @@ import { TrainingPlanService } from '../services/training-plan.service';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { intensityRangeValidator } from '../validators/intensity-range.validator';
+import { Router } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-add-event',
@@ -22,12 +23,15 @@ export class AddEventComponent implements OnInit {
 
   showPlanForm: boolean = false;
   showEventForm: boolean = false;
+  routerInstance: Router | undefined;
 
   constructor(
     private eventService: CalendarEventService,
     private planService: TrainingPlanService,
+    private router: Router,
     private fb: FormBuilder
   ) {
+    this.routerInstance = router;
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
       date: ['', Validators.required],
@@ -143,5 +147,9 @@ export class AddEventComponent implements OnInit {
 
   private resetPlanForm(): void {
     this.planForm.reset();
+  }
+
+  navigateToPlans(): void {
+    this.router.navigate(['/training-plans']);
   }
 }

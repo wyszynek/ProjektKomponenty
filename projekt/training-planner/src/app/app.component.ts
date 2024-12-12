@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule } from '@angular/router'; 
 import { CalendarComponent } from './calendar/calendar.component';
-import { AddEventComponent } from './add-event/add-event.component';
+import { TrainingPlansComponent } from './training-plans/training-plans.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CalendarComponent, AddEventComponent],
+  standalone: true,  
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  imports: [RouterModule, CalendarComponent, TrainingPlansComponent],
 })
 export class AppComponent {
-  title = 'student-app';
+  title = 'Angular Standalone App';
 }

@@ -95,7 +95,7 @@ export class CalendarComponent implements OnInit {
         console.log('Raw plans:', plans);
         this.trainingPlans = plans.map((plan) => ({
           ...plan,
-          color: generateRandomColor(), // Generate and store color for each plan
+          color: generateRandomColor(), 
         }));
 
         const events = this.trainingPlans.flatMap((plan) =>
