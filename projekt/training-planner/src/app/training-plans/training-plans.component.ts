@@ -3,13 +3,14 @@ import { TrainingPlanService } from '../services/training-plan.service';
 import { CommonModule } from '@angular/common';
 import { EditWorkoutComponent } from '../edit-event/edit-event.component';
 import { Router } from '@angular/router';
+import { ChangeColorDirective } from '../directives/change-color.directive';
 
 @Component({
   standalone: true,
   selector: 'app-training-plans',
   templateUrl: './training-plans.component.html',
   styleUrls: ['./training-plans.component.css'],
-  imports: [CommonModule, EditWorkoutComponent],
+  imports: [CommonModule, EditWorkoutComponent,ChangeColorDirective],
 })
 export class TrainingPlansComponent implements OnInit {
   trainingPlans: any[] = [];

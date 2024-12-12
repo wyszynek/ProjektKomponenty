@@ -18,9 +18,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let plan of trainingPlans" (click)="onEdit(plan)">
-        <td>{{ plan.name }}</td>
-        <td>{{ plan.startDate | date:'dd-MM-yyyy' }}</td>
-        <td>{{ plan.endDate | date:'dd-MM-yyyy' }}</td>
+        <td appChangeColor>{{ plan.name }}</td>
+        <td appChangeColor>{{ plan.startDate | date:'dd-MM-yyyy' }}</td>
+        <td appChangeColor>{{ plan.endDate | date:'dd-MM-yyyy' }}</td>
       </tr>
     </tbody>
   </table>
@@ -29,7 +29,6 @@
 <div *ngIf="trainingPlans.length === 0" class="no-plans">
   <p>No training plans available.</p>
 </div>
-
 <app-edit-workout *ngIf="selectedPlan"
       [plan]="selectedPlan"
       (cancel)="handleCancelEditPlan()"
@@ -37,10 +36,7 @@
       (delete)="handleDeletePlan($event)">
 </app-edit-workout>
 
-<!-- Przycisk z ngSwitch -->
 <div [ngSwitch]="trainingPlans.length">
-  <!-- Przycisk, gdy brak planów (length === 0) -->
-  <button *ngSwitchCase="0" class="goBack noPlansButton" (click)="navigateToPlans()">Go Back to Add New Plans</button>
+  <button *ngSwitchCase="0" class="goBack addPlansButton" (click)="navigateToPlans()">Go Back to Add New Plans</button>
   <button *ngSwitchDefault class="goBack plansButton" (click)="navigateToPlans()">Go Back to Home</button>
-
 </div>

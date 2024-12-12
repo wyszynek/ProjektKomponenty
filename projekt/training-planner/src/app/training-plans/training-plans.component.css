@@ -142,11 +142,6 @@ button:hover {
     box-shadow: 0 6px 8px rgba(0,0,0,0.15);
   }
   
-  .addPlansButton {
-    background-color: green;
-    color: white;
-  }
-  
   .homeButton {
     background-color: red; 
     color: white;
