@@ -1,5 +1,5 @@
 <div class="top-buttons">
-  <button (click)="navigateToPlans()">Go To All Plans</button>
+  <button class="go-to-all-plans" (click)="navigateToPlans()">Go To All Plans</button>
   <button (click)="showPlanForm = true">Add New Training Plan</button>
   <button (click)="showEventForm = true">Add New Workout</button>
 </div>
@@ -31,9 +31,10 @@
           <small *ngIf="planForm.controls['newPlanEndDate'].hasError('required')">End Date is required.</small>
         </div>
       </label>
-
-      <button type="submit" [disabled]="planForm.invalid">Add Training Plan</button>
-      <button class="close-button" (click)="showPlanForm = false">Close</button>
+      <div class="form-buttons">
+        <button type="submit">Add Training Plan</button>
+        <button class="close-button" (click)="showPlanForm = false; planForm.reset()">Close</button>
+      </div>
     </form>
   </div>
 </div>
@@ -98,8 +99,10 @@
         <textarea formControlName="description"></textarea>
       </label>
 
-      <button (click)="showWorkoutForm()">Add New Workout</button>
+      <div class="form-buttons">
+      <button class="add-workout" (click)="showWorkoutForm()">Add New Workout</button>
       <button class="close-button" (click)="showEventForm = false; eventForm.reset()">Close</button>
+    </div>
     </form>
   </div>
 </div>

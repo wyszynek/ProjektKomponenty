@@ -12,8 +12,8 @@
           <span [class]="getSortIcon('startDate')"></span>
         </th>
         <th (click)="sortTable('endDate')">
-          End 
-          <span [class]="getSortIcon('endDate')"></span>
+          End <span [class]="getSortIcon('endDate')"></span>
+          
         </th>
       </tr>
     </thead>
@@ -39,5 +39,5 @@
 </app-edit-workout>
 
 <div>
-  <button (click)="navigateToPlans()">Go Back</button>
+  <button class="goBack" (click)="navigateToPlans()">Go Back</button>
 </div>

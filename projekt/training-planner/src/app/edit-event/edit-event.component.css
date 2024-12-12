@@ -1,104 +1,8 @@
-.edit-workout-form {
-  max-width: 500px;
-  margin: 0 auto;
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.edit-workout-form,
+.check-workout,
+.check-plan {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-family: 'Arial', sans-serif;
-  font-size: 24px;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #555;
-  display: block;
-  margin-bottom: 5px;
-}
-
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: #4caf50;
-  outline: none;
-}
-
-textarea {
-  min-height: 120px;
-}
-
-select {
-  -webkit-appearance: none; /* Usunięcie domyślnego wyglądu */
-  -moz-appearance: none;
-  appearance: none;
-  background-color: #fff;
-  background-image: url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%202%22%3E%3Cpolygon%20points=%220,0%204,0,2,2%22%20fill=%22%23ccc%22/%3E%3C/svg%3E');
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px; /* Dodatkowa przestrzeń na strzałkę */
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.save-btn {
-  background-color: #4caf50;
-  color: white;
-}
-
-.save-btn:hover {
-  background-color: #45a049;
-}
-
-.cancel-btn {
-  background-color: #8e7d7c;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #615a5a;
-}
-
-.delete-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #d32f2f;
-}
-
 
 .modal-overlay {
   position: fixed;
@@ -106,36 +10,140 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  backdrop-filter: blur(5px);
 }
 
-/* Zawartość modal - wyśrodkowany blok */
 .modal-content {
-background-color: #fff;
-padding: 20px;
-border-radius: 8px;
-width: 400px;
-max-width: 90%;
-max-height: 80%;
-overflow-y: auto;
-box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 450px;
+  max-width: 95%;
+  max-height: 85%;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease-out;
 }
 
-.modal-content h3 {
-margin-bottom: 15px;
-color: #333;
-font-size: 20px;
-border-bottom: 2px solid #00aaff;
-padding-bottom: 5px;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2196f3;
+  font-size: 22px;
+  border-bottom: 3px solid #2196f3;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
 }
 
 .modal-content label {
-display: block;
-font-weight: bold;
-margin-bottom: 5px;
-color: #555;
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 14px;
+}
+
+.modal-content input, 
+.modal-content textarea, 
+.modal-content select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content input:focus, 
+.modal-content textarea:focus, 
+.modal-content select:focus {
+  border-color: #2196f3;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.modal-content select {
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%232196f3" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  display: inline-block;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.save-btn {
+  background: linear-gradient(to right, #4caf50, #45a049);
+  color: white;
+}
+
+.save-btn:hover {
+  background: linear-gradient(to right, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.delete-btn {
+  background: linear-gradient(to right, #f44336, #d32f2f);
+  color: white;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(to right, #d32f2f, #b71c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.cancel-btn {
+  background: linear-gradient(to right, #666, #555);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(to right, #555, #444);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
 }

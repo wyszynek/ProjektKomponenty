@@ -1,139 +1,119 @@
-.event-tooltip {
-    background-color: rgba(0, 0, 0, 0.75);
-    color: white;
-    padding: 12px;
-    border-radius: 5px;
-    font-size: 14px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    max-width: 200px;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  
-  h1 {
-    text-align: center;
-    position: absolute;
-    margin-top: 20px;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 46px;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    background: linear-gradient(45deg, #133e87, #608bc1);
-    -webkit-background-clip: text;
-    color: transparent;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
-  }
-  
-  .filter-container {
-    display: flex;
-    flex-direction: column;
-    width: 250px;
-    margin: 10px 0;
-    margin-left: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .filter-container label {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #333;
-  }
-  
-  .filter-container select {
-    padding: 12px 16px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s ease;
-  }
-  
-  .filter-container select:hover {
-    border-color: #0056b3;
-  }
-  
-  .filter-container option {
-    padding: 12px;
-    background-color: #ffffff;
-    color: #333;
-  }
-  
-  .filter-container select:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-  }
-  
-  
-  
-  
-  .plans-table {
-    margin-top: 2rem;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: transparent; /* Usunięto tło */
-    box-shadow: none; /* Usunięto cień */
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .plans-table h3 {
-    text-align: center;
-    font-size: 24px;
-    color: #133e87;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    background: none; /* Usunięto tło */
-  }
-  
-  table {
-    width: 80%;
-    border-collapse: collapse;
-    background-color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 0 auto;
-  }
-  
-  thead {
-    background-color: #133e87; /* Jednolity kolor bez podświetlenia */
-    color: white;
-    text-transform: uppercase;
-    font-size: 14px;
-    letter-spacing: 1px;
-  }
-  
-  th, td {
-    text-align: left;
-    padding: 12px 16px;
-    border: 1px solid #ddd;
-  }
-  
-  th {
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  tr:hover {
-    background-color: #e3f2fd;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .no-plans {
-    color: #d32f2f;
-    font-style: italic;
-    margin-top: 1rem;
-    text-align: center;
-    font-size: 16px;
-  }
+.plans-table {
+  margin: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.plans-table h3 {
+  background-color: #2196f3;
+  color: white;
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.plans-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.plans-table thead {
+  background-color: #f0f4f8;
+}
+
+.plans-table th {
+  padding: 15px 20px;
+  text-align: left;
+  color: #2196f3;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.plans-table th:hover {
+  background-color: #e6f2ff;
+}
+
+.plans-table th span {
+  margin-left: 10px;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+
+.plans-table .sort-asc::after {
+  content: '▲';
+  color: #2196f3;
+  font-size: 12px;
+}
+
+.plans-table .sort-desc::after {
+  content: '▼';
+  color: #2196f3;
+  font-size: 12px;
+}
+
+.plans-table tbody tr {
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.plans-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.plans-table tbody tr:hover {
+  background-color: #e6f2ff;
+}
+
+.plans-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 15px;
+  color: #333;
+}
+
+.no-plans {
+  text-align: center;
+  margin: 50px 0;
+  color: #666;
+  font-size: 18px;
+}
+
+.no-plans p {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(to right, #3494e6, #2196f3);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(to right, #2196f3, #1e88e5);
+}
   
   .sort-asc-icon::after {
     content: '▲'; /* Strzałka w górę */
@@ -146,3 +126,19 @@
     font-size: 10px;
     margin-left: 5px;
   }
+
+  .goBack {
+    margin-left: 2rem;
+    float: left;
+    display: flex;         
+    justify-content: flex-start;  
+    background: linear-gradient(to right, #ff6b6b, #ff4757);
+    color: #fff;
+  }
+
+  .goBack:hover{
+    background: linear-gradient(to right, #ff4757, #ff3243);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
