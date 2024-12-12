@@ -13,7 +13,6 @@
         </th>
         <th (click)="sortTable('endDate')">
           End <span [class]="getSortIcon('endDate')"></span>
-          
         </th>
       </tr>
     </thead>
@@ -38,6 +37,10 @@
       (delete)="handleDeletePlan($event)">
 </app-edit-workout>
 
-<div>
-  <button class="goBack" (click)="navigateToPlans()">Go Back</button>
+<!-- Przycisk z ngSwitch -->
+<div [ngSwitch]="trainingPlans.length">
+  <!-- Przycisk, gdy brak planów (length === 0) -->
+  <button *ngSwitchCase="0" class="goBack noPlansButton" (click)="navigateToPlans()">Go Back to Add New Plans</button>
+  <button *ngSwitchDefault class="goBack plansButton" (click)="navigateToPlans()">Go Back to Home</button>
+
 </div>
