@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CalendarEventService } from '../services/calendar-event.service';
 import { TrainingPlanService } from '../services/training-plan.service';
+import { intensityRangeValidator } from '../validators/intensity-range.validator';
+import { dateRangeValidator } from '../validators/date-range.validator';
 
 @Component({
   standalone: true,
@@ -27,6 +29,8 @@ export class EditWorkoutComponent implements OnInit {
   workoutForm: FormGroup;
   planForm: FormGroup;
 
+  dateWorkoutError: string | null = null;
+
   constructor(
     private fb: FormBuilder,
     private eventService: CalendarEventService,
@@ -38,17 +42,19 @@ export class EditWorkoutComponent implements OnInit {
       originalTrainingPlanId: [null, Validators.required], // Oryginalny ID planu
       trainingType: ['', Validators.required],
       date: ['', Validators.required],
-      intensity: [null, [Validators.required, Validators.min(1), Validators.max(10)]],
+      intensity: [null, [Validators.required, intensityRangeValidator(1,10)]],
       duration: [null, [Validators.required, Validators.min(1)]],
       description: [''],
     });
     
-    this.planForm = this.fb.group({
-      id: [null], 
-      name: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
-    });
+    this.planForm = this.fb.group(
+      {
+        name: ['', Validators.required],
+        startDate: ['', Validators.required],
+        endDate: ['', Validators.required],
+      },
+      { validators: dateRangeValidator } // Dodaj walidator
+    );
   }
 
   formatDate(date: string): string {
@@ -105,7 +111,6 @@ export class EditWorkoutComponent implements OnInit {
   saveWorkout(): void {
     if (this.workoutForm.invalid) {
       this.workoutForm.markAllAsTouched();
-      alert('Please fill in all required fields correctly.');
       return;
     }
   
@@ -118,7 +123,7 @@ export class EditWorkoutComponent implements OnInit {
         const endDate = new Date(plan.endDate);
   
         if (workoutDate < startDate || workoutDate > endDate) {
-          alert('The date does not fit within the plan`s period of operation.');
+          this.dateWorkoutError = 'The date does not fit within the plan`s period of operation.';
           return;
         }
   
@@ -156,7 +161,6 @@ export class EditWorkoutComponent implements OnInit {
   savePlan(): void {
     if (this.planForm.invalid) {
       this.planForm.markAllAsTouched();
-      alert('Please fill in all required fields correctly.');
       return;
     }
   

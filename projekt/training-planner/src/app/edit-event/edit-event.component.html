@@ -1,7 +1,9 @@
 <div *ngIf="workout != null" class="check-workout">
   <div class="modal-overlay" id="edit-form">
     <div class="modal-content">
+
       <h2>Edit Workout</h2>
+
       <form [formGroup]="workoutForm" (ngSubmit)="saveWorkout()">
         <div class="form-group">
           <label for="trainingPlanId">Training Plan:</label>
@@ -11,25 +13,47 @@
             </option>
           </select>
         </div>
+
         <div class="form-group">
           <label for="trainingType">Training Type:</label>
-          <input id="trainingType" type="text" formControlName="trainingType" />
+          <input id="trainingType" formControlName="trainingType" type="text" placeholder="Enter training type" />
+          <div *ngIf="workoutForm.controls['trainingType'].invalid && workoutForm.controls['trainingType'].touched">
+            <small *ngIf="workoutForm.controls['trainingType'].hasError('required')">Training Type is required.</small>
+          </div>
         </div>
+
         <div class="form-group">
           <label for="date">Date:</label>
           <input id="date" type="date" formControlName="date" />
+          <div *ngIf="workoutForm.controls['date'].invalid && workoutForm.controls['date'].touched">
+            <small *ngIf="workoutForm.controls['date'].hasError('required')">Date is required.</small>
+          </div>
         </div>
+
         <div class="form-group">
           <label for="intensity">Intensity (1-10):</label>
           <input id="intensity" type="number" formControlName="intensity" />
+          <div *ngIf="workoutForm.controls['intensity'].invalid && workoutForm.controls['intensity'].touched">
+            <small *ngIf="workoutForm.controls['intensity'].hasError('intensityRange')">Intensity must be between 1 and 10.</small>
+          </div>
         </div>
+
         <div class="form-group">
           <label for="duration">Duration:</label>
           <input id="duration" type="number" formControlName="duration" />
+          <div *ngIf="workoutForm.controls['duration'].invalid && workoutForm.controls['duration'].touched">
+            <small *ngIf="workoutForm.controls['duration'].hasError('required')">Duration is required.</small>
+            <small *ngIf="workoutForm.controls['duration'].hasError('min')">Duration must be at least 1 minute.</small>
+          </div>
         </div>
+
         <div class="form-group">
           <label for="description">Description:</label>
           <textarea id="description" formControlName="description"></textarea>
+        </div>
+
+        <div *ngIf="dateWorkoutError" class="error-message">
+          <small>{{ dateWorkoutError }}</small>
         </div>
         
         <div class="form-actions">
@@ -37,6 +61,7 @@
           <button type="button" (click)="deleteWorkout()" class="delete-btn">Delete</button>
           <button type="button" (click)="cancelEdit()" class="cancel-btn">Cancel</button>
         </div>
+
       </form>
     </div>
   </div>
@@ -45,22 +70,37 @@
 <div *ngIf="plan != null" class="check-plan">
   <div class="modal-overlay" id="edit-form">
     <div class="modal-content">
+
       <h2>Edit Training Plan</h2>
+      
       <form [formGroup]="planForm" (ngSubmit)="savePlan()">
         
         <div class="form-group">
           <label for="name">Name:</label>
           <input id="name" type="text" formControlName="name" />
+          <div *ngIf="planForm.controls['name'].invalid && planForm.controls['name'].touched">
+            <small *ngIf="planForm.controls['name'].hasError('required')">Name is required.</small>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="startDate">Start Date:</label>
           <input id="startDate" type="date" formControlName="startDate" />
+          <div *ngIf="planForm.controls['startDate'].invalid && planForm.controls['startDate'].touched">
+            <small *ngIf="planForm.controls['startDate'].hasError('required')">Date is required.</small>
+          </div>
         </div>
       
         <div class="form-group">
           <label for="endDate">End Date:</label>
           <input id="endDate" type="date" formControlName="endDate" />
+          <div *ngIf="planForm.controls['endDate'].invalid && planForm.controls['endDate'].touched">
+            <small *ngIf="planForm.controls['endDate'].hasError('required')">Date is required.</small>
+          </div>
+        </div>
+
+        <div *ngIf="planForm.errors?.['dateRangeInvalid']">
+          <small>Start Date cannot be later than End Date.</small>
         </div>
       
         <div class="form-actions">
@@ -68,6 +108,7 @@
           <button type="button" (click)="deletePlan()" class="delete-btn">Delete</button>
           <button type="button" (click)="cancelEdit()" class="cancel-btn">Cancel</button>
         </div>
+
       </form>
     </div>
   </div>
