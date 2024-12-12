@@ -49,6 +49,7 @@ export class EditWorkoutComponent implements OnInit {
     
     this.planForm = this.fb.group(
       {
+        id: [null],
         name: ['', Validators.required],
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],

@@ -99,6 +99,10 @@
         <textarea formControlName="description"></textarea>
       </label>
 
+      <div *ngIf="eventForm.errors?.['dateRangeInvalid']">
+        <small>Start Date cannot be later than End Date.</small>
+      </div>
+
       <div class="form-buttons">
       <button class="add-workout" (click)="showWorkoutForm()">Add New Workout</button>
       <button class="close-button" (click)="showEventForm = false; eventForm.reset()">Close</button>

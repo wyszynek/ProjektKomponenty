@@ -48,6 +48,7 @@ export class TrainingPlansComponent implements OnInit {
         console.log('Plan zaktualizowany');
         this.selectedPlan = null;
         this.loadTrainingPlans();
+        this.isEditModalOpen = false;
       },
       error: (err) => console.error('Błąd aktualizacji planu:', err),
     });

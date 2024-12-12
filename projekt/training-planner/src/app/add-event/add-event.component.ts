@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { CommonModule } from '@angular/common';
 import { intensityRangeValidator } from '../validators/intensity-range.validator';
 import { Router } from '@angular/router';
+import { dateRangeValidator } from '../validators/date-range.validator';
 @Component({
   standalone: true,
   selector: 'app-add-event',
@@ -45,7 +46,7 @@ export class AddEventComponent implements OnInit {
       newPlanName: ['', Validators.required],
       newPlanStartDate: ['', Validators.required],
       newPlanEndDate: ['', Validators.required],
-    });
+    }, { validators: dateRangeValidator });
   }
 
   ngOnInit(): void {
@@ -114,6 +115,11 @@ export class AddEventComponent implements OnInit {
     }
 
     const formValues = this.planForm.value;
+
+    if (new Date(formValues.newPlanStartDate) > new Date(formValues.newPlanEndDate)) {
+      alert('Start date can`t be later than end date.');
+      return;
+    }
 
     const newPlan = {
       name: formValues.newPlanName,
