@@ -53,7 +53,7 @@ export class AddEventComponent implements OnInit {
   }
 
   loadActivePlans(): void {
-    this.planService.getActiveTrainingPlans('').subscribe({
+    this.planService.getActiveTrainingPlans().subscribe({
       next: (plans) => {
         this.allPlans = plans;
         this.activePlans = plans;

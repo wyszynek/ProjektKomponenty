@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CalendarEventService } from '../services/calendar-event.service';
 import { TrainingPlanService } from '../services/training-plan.service';
 
@@ -9,7 +9,7 @@ import { TrainingPlanService } from '../services/training-plan.service';
   selector: 'app-edit-workout',
   templateUrl: './edit-event.component.html',
   styleUrls: ['./edit-event.component.css'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class EditWorkoutComponent implements OnInit {
   @Input() workout: any; // Otrzymuje dane treningu
@@ -20,13 +20,36 @@ export class EditWorkoutComponent implements OnInit {
 
   availablePlans: any[] = [];
   originalTrainingPlanId: number | undefined;
-  editableWorkout: any = {};
-  editablePlan: any = {};
 
   selectedStartDate: any;
   selectedEndDate: any;
 
-  constructor(private eventService: CalendarEventService, private trainingPlanService: TrainingPlanService) {}
+  workoutForm: FormGroup;
+  planForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder,
+    private eventService: CalendarEventService,
+    private trainingPlanService: TrainingPlanService
+  ) {
+    this.workoutForm = this.fb.group({
+      id: [null], 
+      trainingPlanId: [null], 
+      originalTrainingPlanId: [null, Validators.required], // Oryginalny ID planu
+      trainingType: ['', Validators.required],
+      date: ['', Validators.required],
+      intensity: [null, [Validators.required, Validators.min(1), Validators.max(10)]],
+      duration: [null, [Validators.required, Validators.min(1)]],
+      description: [''],
+    });
+    
+    this.planForm = this.fb.group({
+      id: [null], 
+      name: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+    });
+  }
 
   formatDate(date: string): string {
     const d = new Date(date);
@@ -35,15 +58,31 @@ export class EditWorkoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTrainingPlans();
+
     if (this.workout) {
+      if (this.workout) {
+        this.workoutForm.patchValue({
+          id: this.workout.id,
+          trainingPlanId: this.workout.trainingPlanId,
+          originalTrainingPlanId: this.workout.trainingPlanId,
+          trainingType: this.workout.trainingType,
+          date: this.workout.date,
+          intensity: this.workout.intensity,
+          duration: this.workout.duration,
+          description: this.workout.description,
+        });
+      }
+
       this.originalTrainingPlanId = this.workout.trainingPlanId;
-      this.editableWorkout = { ...this.workout };
-    } else if (this.plan) {
-      this.editablePlan = { 
-        ...this.plan,
+    }
+
+    if (this.plan) {
+      this.planForm.patchValue({
+        id: this.plan.id, 
+        name: this.plan.name,
         startDate: this.formatDate(this.plan.startDate),
-        endDate: this.formatDate(this.plan.endDate)
-      };
+        endDate: this.formatDate(this.plan.endDate),
+      });
     }
   }
 
@@ -63,138 +102,77 @@ export class EditWorkoutComponent implements OnInit {
     });
   }
 
-
-  //Kiedy użytkownik zmienia tekst w jakimś polu, zdarzenie input jest wywoływane.
-  //event.target odnosi się do elementu <input>, który został zmodyfikowany.
-  //Za pomocą inputElement.value, otrzymujemy wartość wpisaną przez użytkownika.
-  //Bez tych metod, zmiany w formularzu nie byłyby automatycznie przekazywane do modelu.
-
-  onTrainingTypeInput(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editableWorkout.trainingType = inputElement.value.trim();
-  }
-
-  onDateInput(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editableWorkout.date = inputElement.value;
-  }
-
-  onIntensityInput(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    const value = parseInt(inputElement.value, 10);
-    this.editableWorkout.intensity = isNaN(value) ? null : value;
-  }
-
-  onDurationInput(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    const value = parseFloat(inputElement.value);
-    this.editableWorkout.duration = isNaN(value) ? 0 : value;
-  }
-
-  onDescriptionInput(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editableWorkout.description = inputElement.value.trim();
-  }
-
   saveWorkout(): void {
-    if (this.editableWorkout.date == null) {
+    if (this.workoutForm.invalid) {
+      this.workoutForm.markAllAsTouched();
       alert('Please fill in all required fields correctly.');
       return;
     }
-
-    if (this.editableWorkout.trainingType == "") {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-
-    if (this.editableWorkout.intensity == null || this.editableWorkout.intensity > 10 || this.editableWorkout.intensity < 1) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-
-    if (this.editableWorkout.duration < 1 || this.editableWorkout.duration == null) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-
-    this.trainingPlanService.getPlan(this.editableWorkout.trainingPlanId).subscribe({
+  
+    const workoutData = this.workoutForm.value;
+  
+    this.trainingPlanService.getPlan(workoutData.trainingPlanId).subscribe({
       next: (plan) => {
-        this.selectedStartDate = new Date(plan.startDate);
-        this.selectedEndDate = new Date(plan.endDate); 
-
-        const workoutDate = new Date(this.editableWorkout.date);
-
-        this.selectedStartDate.setHours(0, 0, 0, 0);
-        this.selectedEndDate.setHours(0, 0, 0, 0);
-        workoutDate.setHours(0, 0, 0, 0);
-
-        if (workoutDate < this.selectedStartDate || workoutDate > this.selectedEndDate) {
+        const workoutDate = new Date(workoutData.date);
+        const startDate = new Date(plan.startDate);
+        const endDate = new Date(plan.endDate);
+  
+        if (workoutDate < startDate || workoutDate > endDate) {
           alert('The date does not fit within the plan`s period of operation.');
           return;
         }
   
+        // Dane do zapisania, uwzględniające oba identyfikatory
         const workoutToSave = {
-          ...this.editableWorkout,
-          originalTrainingPlanId: this.originalTrainingPlanId,
-          updatedTrainingPlanId: this.editableWorkout.trainingPlanId,
+          ...workoutData,
+          originalTrainingPlanId: this.workoutForm.value.originalTrainingPlanId,
+          updatedTrainingPlanId: workoutData.trainingPlanId,
         };
   
+        console.log('Workout to Save:', workoutToSave); // Debugowanie
         this.save.emit(workoutToSave);
-        this.selectedStartDate = null;
-        this.selectedEndDate = null;
       },
-      error: (err) => {
-        console.error('Error fetching plan:', err);
-        alert('Failed to fetch the training plan. Please try again.');
-      }
+      error: () => alert('Failed to fetch the training plan. Please try again.'),
     });
   }
 
   cancelEdit(): void {
+    if (this.workout) {
+      this.workoutForm.reset();
+    }
+
+    if(this.plan) {
+      this.planForm.reset();
+    }
+
     this.cancel.emit();
   }
 
   deleteWorkout(): void {
-    this.delete.emit(this.editableWorkout);
-  }
-
-
-  onNameChange(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editablePlan.name = inputElement.value.trim();
-  }
-  
-  onStartDateChange(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editablePlan.startDate = inputElement.value;
-  }
-  
-  onEndDateChange(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.editablePlan.startDate = inputElement.value;
+    const workoutData = this.workoutForm.value;
+    this.delete.emit(workoutData);
   }
 
   savePlan(): void {
-    if (this.editablePlan.startDate > this.editablePlan.endDate) {
+    if (this.planForm.invalid) {
+      this.planForm.markAllAsTouched();
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+  
+    const planData = this.planForm.value;
+  
+    if (new Date(planData.startDate) > new Date(planData.endDate)) {
       alert('Start date can`t be later than end date.');
       return;
     }
-
-    if (this.editablePlan.startDate == null ||  this.editablePlan.endDate == null) {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-
-    if (this.editablePlan.name == "") {
-      alert('Please fill in all required fields correctly.');
-      return;
-    }
-
-    this.save.emit(this.editablePlan);
+  
+    this.save.emit(planData);
   }
 
   deletePlan(): void {
-    console.log('Deleting plan:', this.editablePlan);
-    this.delete.emit(this.editablePlan);
+    const planData = this.planForm.value;
+    console.log('Deleting plan:', planData);
+    this.delete.emit(planData);
   }
 }

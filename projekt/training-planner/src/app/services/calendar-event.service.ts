@@ -58,10 +58,6 @@ export class CalendarEventService {
     );
   }
 
-  getWorkoutDetails(planId: number, workoutId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${planId}/workouts/${workoutId}`);
-  }
-
   deleteWorkout(planId: number, workoutId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${planId}/workouts/${workoutId}`);
   }

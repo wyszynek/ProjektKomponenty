@@ -14,7 +14,7 @@ export class TrainingPlanService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  getActiveTrainingPlans(date: string): Observable<any[]> {
+  getActiveTrainingPlans(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl+'/active');
   }
 
